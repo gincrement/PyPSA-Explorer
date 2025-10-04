@@ -1,0 +1,30 @@
+"""Callback functions for PyPSA Explorer dashboard interactivity."""
+
+from pypsa_explorer.callbacks.filters import register_filter_callbacks
+from pypsa_explorer.callbacks.navigation import register_navigation_callbacks
+from pypsa_explorer.callbacks.network import register_network_callbacks
+from pypsa_explorer.callbacks.visualizations import register_visualization_callbacks
+
+__all__ = [
+    "register_filter_callbacks",
+    "register_navigation_callbacks",
+    "register_network_callbacks",
+    "register_visualization_callbacks",
+]
+
+
+def register_all_callbacks(app, networks: dict) -> None:
+    """
+    Register all dashboard callbacks.
+
+    Parameters
+    ----------
+    app : dash.Dash
+        The Dash application instance
+    networks : dict
+        Dictionary of loaded PyPSA networks
+    """
+    register_filter_callbacks(app)
+    register_navigation_callbacks(app)
+    register_network_callbacks(app, networks)
+    register_visualization_callbacks(app, networks)
