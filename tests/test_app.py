@@ -1,6 +1,5 @@
 """Tests for main application module."""
 
-
 from pypsa_explorer.app import create_app
 
 

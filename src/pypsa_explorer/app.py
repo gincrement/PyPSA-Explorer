@@ -1,6 +1,5 @@
 """Main application module for PyPSA Explorer dashboard."""
 
-
 import dash
 import dash_bootstrap_components as dbc
 import pypsa

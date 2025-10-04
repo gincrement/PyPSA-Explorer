@@ -1,6 +1,5 @@
 """Configuration settings for PyPSA Explorer dashboard."""
 
-
 import plotly.graph_objects as go
 import plotly.io as pio
 

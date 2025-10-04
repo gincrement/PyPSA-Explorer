@@ -1,6 +1,5 @@
 """Pytest configuration and fixtures for PyPSA Explorer tests."""
 
-
 import pypsa
 import pytest
 
