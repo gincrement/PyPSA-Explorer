@@ -1,101 +1,156 @@
 """Command-line interface for PyPSA Explorer."""
 
-import argparse
-import sys
+from typing import Annotated
+
+import typer
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
 
 from pypsa_explorer import __version__
 from pypsa_explorer.app import run_dashboard
 from pypsa_explorer.utils.network_loader import parse_cli_network_args
 
+app = typer.Typer(
+    name="pypsa-explorer",
+    help="🔌 Interactive dashboard for visualizing PyPSA energy system networks",
+    add_completion=True,
+    rich_markup_mode="rich",
+    no_args_is_help=False,
+)
+console = Console()
 
-def main() -> None:
-    """Main CLI entry point."""
-    parser = argparse.ArgumentParser(
-        description="PyPSA Explorer - Interactive dashboard for visualizing PyPSA energy system networks",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  # Run with default demo network
-  pypsa-explorer
 
-  # Run with a single network
-  pypsa-explorer /path/to/network.nc
+def version_callback(value: bool) -> None:
+    """Print version and exit."""
+    if value:
+        console.print(f"[bold cyan]pypsa-explorer[/bold cyan] version [green]{__version__}[/green]")
+        raise typer.Exit()
 
-  # Run with multiple networks (with labels)
-  pypsa-explorer /path/to/network1.nc:Region1 /path/to/network2.nc:Region2
 
-  # Run with custom host and port
-  pypsa-explorer --host 0.0.0.0 --port 8080
+@app.command()
+def main(
+    networks: Annotated[
+        list[str] | None,
+        typer.Argument(
+            help="Network files to load. Format: path or path:label",
+            show_default=False,
+        ),
+    ] = None,
+    host: Annotated[
+        str,
+        typer.Option(
+            "--host",
+            "-h",
+            help="Host to run the server on",
+            rich_help_panel="Server Options",
+        ),
+    ] = "127.0.0.1",
+    port: Annotated[
+        int,
+        typer.Option(
+            "--port",
+            "-p",
+            help="Port to run the server on",
+            rich_help_panel="Server Options",
+        ),
+    ] = 8050,
+    debug: Annotated[
+        bool,
+        typer.Option(
+            "--debug/--no-debug",
+            help="Enable or disable debug mode",
+            rich_help_panel="Server Options",
+        ),
+    ] = True,
+    _version: Annotated[
+        bool | None,
+        typer.Option(
+            "--version",
+            "-v",
+            callback=version_callback,
+            is_eager=True,
+            help="Show version and exit",
+        ),
+    ] = None,
+) -> None:
+    """
+    Launch the PyPSA Explorer dashboard.
 
-  # Run in production mode (no debug)
-  pypsa-explorer --no-debug
-        """,
-    )
+    [dim]Examples:[/dim]
 
-    parser.add_argument(
-        "networks",
-        nargs="*",
-        help="Network files to load. Format: path or path:label",
-    )
+    [cyan]# Run with default demo network[/cyan]
+    $ pypsa-explorer
 
-    parser.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="Host to run the server on (default: 127.0.0.1)",
-    )
+    [cyan]# Run with a single network[/cyan]
+    $ pypsa-explorer /path/to/network.nc
 
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8050,
-        help="Port to run the server on (default: 8050)",
-    )
+    [cyan]# Run with multiple networks (with labels)[/cyan]
+    $ pypsa-explorer network1.nc:Region1 network2.nc:Region2
 
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        default=True,
-        help="Run in debug mode (default: True)",
-    )
+    [cyan]# Run with custom host and port[/cyan]
+    $ pypsa-explorer --host 0.0.0.0 --port 8080
 
-    parser.add_argument(
-        "--no-debug",
-        action="store_true",
-        help="Disable debug mode",
-    )
-
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=f"pypsa-explorer {__version__}",
-    )
-
-    args = parser.parse_args()
-
+    [cyan]# Run in production mode (no debug)[/cyan]
+    $ pypsa-explorer --no-debug
+    """
     # Parse network arguments
     networks_input = None
-    if args.networks:
-        network_paths = parse_cli_network_args(args.networks)
-        networks_input = network_paths
+    if networks:
+        try:
+            network_paths = parse_cli_network_args(networks)
+            networks_input = network_paths
 
-    # Determine debug mode
-    debug = args.debug and not args.no_debug
+            # Display network info
+            network_table = Table(title="📊 Networks to Load", show_header=True, header_style="bold magenta")
+            network_table.add_column("Label", style="cyan", no_wrap=True)
+            network_table.add_column("Path", style="green")
+
+            for label, path in network_paths.items():
+                network_table.add_row(label, str(path))
+
+            console.print(network_table)
+            console.print()
+
+        except Exception as e:
+            console.print(f"[bold red]❌ Error parsing network arguments:[/bold red] {e}")
+            raise typer.Exit(1) from None
+
+    # Display startup banner
+    startup_panel = Panel.fit(
+        f"""[bold cyan]PyPSA Explorer[/bold cyan] [green]v{__version__}[/green]
+
+🌐 Server: [yellow]{host}:{port}[/yellow]
+🐛 Debug Mode: [yellow]{'enabled' if debug else 'disabled'}[/yellow]
+📁 Networks: [yellow]{len(networks_input) if networks_input else 'demo'}[/yellow]
+
+[dim]Press Ctrl+C to stop the server[/dim]""",
+        title="🔌 Starting Dashboard",
+        border_style="cyan",
+    )
+    console.print(startup_panel)
+    console.print()
 
     # Run the dashboard
     try:
         run_dashboard(
             networks_input=networks_input,
             debug=debug,
-            host=args.host,
-            port=args.port,
+            host=host,
+            port=port,
         )
     except KeyboardInterrupt:
-        print("\nShutting down PyPSA Explorer...")
-        sys.exit(0)
+        console.print("\n[yellow]⏹  Shutting down PyPSA Explorer...[/yellow]")
+        raise typer.Exit(0) from None
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
+        console.print(f"[bold red]❌ Error:[/bold red] {e}")
+        raise typer.Exit(1) from e
+
+
+def cli() -> None:
+    """CLI entry point wrapper."""
+    app()
 
 
 if __name__ == "__main__":
-    main()
+    cli()

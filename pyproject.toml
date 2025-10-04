@@ -32,6 +32,8 @@ dependencies = [
     "dash-bootstrap-components>=1.5",
     "pypsa @ git+https://github.com/PyPSA/PyPSA.git@master",
     "pyyaml>=6.0",
+    "typer>=0.9",
+    "rich>=13.0",
 ]
 
 [project.optional-dependencies]
@@ -67,7 +69,7 @@ Repository = "https://github.com/openenergytransition/pypsa-explorer"
 "Bug Tracker" = "https://github.com/openenergytransition/pypsa-explorer/issues"
 
 [project.scripts]
-pypsa-explorer = "pypsa_explorer.cli:main"
+pypsa-explorer = "pypsa_explorer.cli:cli"
 
 [tool.setuptools]
 packages = ["pypsa_explorer"]
