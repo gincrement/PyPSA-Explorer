@@ -45,7 +45,8 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network]) -> None:
         n = networks[selected_network_label]
         try:
             # Create a folium map using PyPSA's explore method
-            map_obj: folium.Map = n.plot.explore(tooltip=True, popup=True, components=["Bus", "Line", "Link"])
+            # Note: popup parameter removed for PyPSA v1.0 compatibility
+            map_obj: folium.Map = n.plot.explore(tooltip=True, components=["Bus", "Line", "Link"])
             return map_obj._repr_html_()
         except Exception as e:
             print(f"Error creating map: {e}")
