@@ -14,6 +14,12 @@ uv run main.py /path/to/network.nc
 uv run main.py /path/to/network1.nc:Label1 /path/to/network2.nc:Label2
 ```
 
+### Testing the Application
+```bash
+# Run tests
+uv run pytest
+```
+
 ### Code Quality
 ```bash
 # Format code using ruff
