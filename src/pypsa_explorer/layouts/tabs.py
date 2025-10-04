@@ -23,7 +23,7 @@ TAB_SELECTED_STYLE = {
 def create_energy_balance_tab() -> dcc.Tab:
     """Create the Energy Balance (timeseries) tab."""
     return dcc.Tab(
-        label="Energy Balance Timeseries",
+        label="📈 Energy Balance Timeseries",
         value="energy-balance",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
@@ -39,7 +39,7 @@ def create_energy_balance_tab() -> dcc.Tab:
 def create_energy_balance_aggregated_tab() -> dcc.Tab:
     """Create the Aggregated Energy Balance tab."""
     return dcc.Tab(
-        label="Energy Balance Totals",
+        label="📊 Energy Balance Totals",
         value="energy-balance-aggregated",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
@@ -55,7 +55,7 @@ def create_energy_balance_aggregated_tab() -> dcc.Tab:
 def create_capacity_tab() -> dcc.Tab:
     """Create the Capacity tab."""
     return dcc.Tab(
-        label="Capacity Totals",
+        label="⚡ Capacity Totals",
         value="capacity",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
@@ -71,7 +71,7 @@ def create_capacity_tab() -> dcc.Tab:
 def create_capex_totals_tab() -> dcc.Tab:
     """Create the CAPEX Totals tab."""
     return dcc.Tab(
-        label="CAPEX Totals",
+        label="💰 CAPEX Totals",
         value="capex",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
@@ -87,7 +87,7 @@ def create_capex_totals_tab() -> dcc.Tab:
 def create_opex_totals_tab() -> dcc.Tab:
     """Create the OPEX Totals tab."""
     return dcc.Tab(
-        label="OPEX Totals",
+        label="💵 OPEX Totals",
         value="opex",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
@@ -103,7 +103,7 @@ def create_opex_totals_tab() -> dcc.Tab:
 def create_network_map_tab() -> dcc.Tab:
     """Create the Network Configuration tab with map and metadata."""
     return dcc.Tab(
-        label="Network Configuration",
+        label="🗺️ Network Configuration",
         value="network-config",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,

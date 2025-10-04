@@ -32,20 +32,71 @@ def create_welcome_page(network_labels: list[str], networks_info: dict[str, dict
                             "position": "absolute",
                             "top": "15px",
                             "right": "15px",
+                            "zIndex": "10",
                         },
                     ),
                 ),
+                # Hero Section
                 html.Div(
                     [
+                        html.Div(
+                            "⚡",
+                            style={
+                                "fontSize": "5rem",
+                                "marginBottom": "20px",
+                                "display": "inline-block",
+                                "animation": "pulse 2s ease-in-out infinite",
+                            },
+                        ),
                         html.H1(
-                            "Welcome to the Energy System Dashboard",
+                            "PyPSA Energy Explorer",
                             className="welcome-header",
                         ),
                         html.P(
-                            "Explore energy systems with interactive visualizations.",
+                            "Analyze and visualize power system networks with interactive, real-time insights",
                             className="welcome-subtitle",
                         ),
-                        html.Hr(className="my-4"),
+                        html.Div(
+                            [
+                                html.Span(
+                                    "🔋 Advanced Analytics",
+                                    style={
+                                        "display": "inline-block",
+                                        "margin": "0 15px",
+                                        "padding": "8px 16px",
+                                        "background": "rgba(255, 255, 255, 0.9)",
+                                        "borderRadius": "20px",
+                                        "fontSize": "0.9rem",
+                                        "fontWeight": "500",
+                                    },
+                                ),
+                                html.Span(
+                                    "📊 Interactive Visualizations",
+                                    style={
+                                        "display": "inline-block",
+                                        "margin": "0 15px",
+                                        "padding": "8px 16px",
+                                        "background": "rgba(255, 255, 255, 0.9)",
+                                        "borderRadius": "20px",
+                                        "fontSize": "0.9rem",
+                                        "fontWeight": "500",
+                                    },
+                                ),
+                                html.Span(
+                                    "🌍 Multi-Network Support",
+                                    style={
+                                        "display": "inline-block",
+                                        "margin": "0 15px",
+                                        "padding": "8px 16px",
+                                        "background": "rgba(255, 255, 255, 0.9)",
+                                        "borderRadius": "20px",
+                                        "fontSize": "0.9rem",
+                                        "fontWeight": "500",
+                                    },
+                                ),
+                            ],
+                            style={"marginTop": "30px", "marginBottom": "20px"},
+                        ),
                     ],
                     className="welcome-card mb-4",
                 ),
