@@ -28,9 +28,9 @@ def setup_plotly_theme() -> None:
     custom_template.layout = go.Layout(
         plot_bgcolor=COLORS["background"],
         paper_bgcolor=COLORS["background"],
-        font=dict(family="Roboto, 'Helvetica Neue', sans-serif", color=COLORS["text"]),
-        xaxis=dict(gridcolor="#e9ecef", zerolinecolor="#e9ecef"),
-        yaxis=dict(gridcolor="#e9ecef", zerolinecolor="#e9ecef"),
+        font={"family": "Roboto, 'Helvetica Neue', sans-serif", "color": COLORS["text"]},
+        xaxis={"gridcolor": "#e9ecef", "zerolinecolor": "#e9ecef"},
+        yaxis={"gridcolor": "#e9ecef", "zerolinecolor": "#e9ecef"},
     )
     pio.templates[PLOTLY_TEMPLATE_NAME] = custom_template
     pio.templates.default = PLOTLY_TEMPLATE_NAME

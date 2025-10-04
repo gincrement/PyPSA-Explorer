@@ -40,7 +40,7 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network]) -> None:
             Input("network-selector", "value"),
         ],
     )
-    def update_map(n_clicks: int | None, selected_network_label: str) -> str:
+    def update_map(n_clicks: int | None, selected_network_label: str) -> str:  # noqa: ARG001
         """Update network map visualization."""
         n = networks[selected_network_label]
         try:
@@ -58,7 +58,7 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network]) -> None:
             Input("network-selector", "value"),
         ],
     )
-    def update_metadata(n_clicks: int | None, selected_network_label: str) -> html.Pre | html.Div:
+    def update_metadata(n_clicks: int | None, selected_network_label: str) -> html.Pre | html.Div:  # noqa: ARG001
         """Display network metadata."""
         n = networks[selected_network_label]
         try:

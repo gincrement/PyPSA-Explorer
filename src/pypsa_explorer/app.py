@@ -15,7 +15,7 @@ from pypsa_explorer.utils.network_loader import load_networks
 def create_app(
     networks_input: dict[str, pypsa.Network | str] | str | None = None,
     title: str = "PyPSA Explorer",
-    debug: bool = False,
+    debug: bool = False,  # noqa: ARG001
 ) -> dash.Dash:
     """
     Create and configure the Dash application.
@@ -46,7 +46,6 @@ def create_app(
     # Get the first network as the active network initially
     network_labels = list(networks.keys())
     active_network_label = network_labels[0]
-    n = networks[active_network_label]
 
     # Initialize Dash app
     app = dash.Dash(

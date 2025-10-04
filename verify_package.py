@@ -49,7 +49,7 @@ def check_functions():
     """Check if main functions are available."""
     print("\n3. Checking main functions...")
     try:
-        from pypsa_explorer import create_app, load_networks, run_dashboard
+        from pypsa_explorer import create_app, load_networks, run_dashboard  # noqa: F401
 
         print("   ✓ create_app")
         print("   ✓ run_dashboard")
@@ -64,7 +64,7 @@ def check_cli():
     """Check if CLI module is accessible."""
     print("\n4. Checking CLI...")
     try:
-        from pypsa_explorer.cli import main
+        from pypsa_explorer.cli import main  # noqa: F401
 
         print("   ✓ CLI module accessible")
         print("   ℹ Run 'python -m pypsa_explorer.cli --version' to test")

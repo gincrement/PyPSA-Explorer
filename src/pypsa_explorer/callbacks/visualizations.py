@@ -259,7 +259,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             fig.update_layout(
                 title=title,
                 height=1000,
-                margin=dict(l=50, r=50, t=100, b=50),
+                margin={"l": 50, "r": 50, "t": 100, "b": 50},
                 paper_bgcolor="#f5f7fa",
                 plot_bgcolor="#f5f7fa",
             )
@@ -320,7 +320,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             fig.update_layout(
                 title=title,
                 height=1000,
-                margin=dict(l=50, r=50, t=100, b=50),
+                margin={"l": 50, "r": 50, "t": 100, "b": 50},
                 paper_bgcolor="#f5f7fa",
                 plot_bgcolor="#f5f7fa",
             )

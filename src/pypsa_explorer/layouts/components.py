@@ -61,7 +61,7 @@ def create_error_message(context: str, error: Exception) -> html.Div:
     )
 
 
-def create_header(n: pypsa.Network, network_labels: list[str], active_network_label: str) -> dbc.Row:
+def create_header(n: pypsa.Network, network_labels: list[str], active_network_label: str) -> dbc.Row:  # noqa: ARG001
     """
     Create the header section with network selector.
 
