@@ -75,6 +75,33 @@ NO_DATA_MSG = html.Div(
 )
 
 
+def create_dark_mode_toggle() -> html.Div:
+    """Create a global dark mode toggle control."""
+
+    return html.Div(
+        [
+            html.Div(
+                [
+                    html.I(className="fas fa-moon", style={"marginRight": "8px", "fontSize": "0.9rem"}),
+                    html.Span("Dark Mode", style={"fontSize": "0.9rem", "fontWeight": "600"}),
+                ],
+                className="dark-mode-toggle-label",
+                style={"display": "flex", "alignItems": "center"},
+            ),
+            dbc.Checklist(
+                id="dark-mode-toggle",
+                options=[{"label": "", "value": "dark"}],
+                value=[],
+                switch=True,
+                persistence=True,
+                persistence_type="local",
+                style={"transform": "scale(1.1)"},
+            ),
+        ],
+        id="dark-mode-toggle-container",
+    )
+
+
 def create_error_message(context: str, error: Exception) -> html.Div:
     """
     Create a standardized error message component.
@@ -164,11 +191,7 @@ def create_header(n: pypsa.Network, network_labels: list[str], active_network_la
                                     options=[{"label": label, "value": label} for label in network_labels],  # type: ignore[arg-type]
                                     value=active_network_label,
                                     clearable=False,
-                                    style={
-                                        "borderRadius": "10px",
-                                        "border": "1px solid rgba(255, 255, 255, 0.3)",
-                                        "backgroundColor": "rgba(255, 255, 255, 0.95)",
-                                    },
+                                    className="network-selector",
                                 ),
                             ],
                             width=6,

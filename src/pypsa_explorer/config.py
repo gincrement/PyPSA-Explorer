@@ -20,14 +20,33 @@ COLORS = {
     "glass_border": "rgba(255, 107, 107, 0.15)",  # Warm coral tint
 }
 
+# Dark mode colors
+COLORS_DARK = {
+    "primary": "#4ECDC4",  # Turquoise (accent becomes primary)
+    "secondary": "#FF6B6B",  # Coral red
+    "accent": "#667EEA",  # Soft blue-purple
+    "warning": "#FFB84D",  # Warm amber
+    "light_bg": "#1A1F36",  # Deep navy
+    "dark_bg": "#0F1419",  # Darker navy
+    "text": "#E2E8F0",  # Light grey for text
+    "light_text": "#94A3B8",  # Medium-light grey
+    "background": "#131C2C",  # Solid dark background
+    "gradient_start": "#667EEA",  # Soft blue-purple
+    "gradient_end": "#FF6B6B",  # Coral - sunset effect
+    "glass_bg": "rgba(26, 31, 54, 0.85)",  # Dark glass
+    "glass_border": "rgba(78, 205, 196, 0.15)",  # Turquoise tint
+}
+
 # Plotly template configuration
 PLOTLY_TEMPLATE_NAME = "dashboard_theme"
+PLOTLY_TEMPLATE_NAME_DARK = "dashboard_theme_dark"
 
 
 def setup_plotly_theme() -> None:
     """Configure Plotly theme for consistent styling across the dashboard."""
     pio.templates.default = "plotly_white"
 
+    # Light mode template
     custom_template = go.layout.Template()
     custom_template.layout = go.Layout(
         plot_bgcolor=COLORS["background"],
@@ -37,6 +56,27 @@ def setup_plotly_theme() -> None:
         yaxis={"gridcolor": "#e9ecef", "zerolinecolor": "#e9ecef"},
     )
     pio.templates[PLOTLY_TEMPLATE_NAME] = custom_template
+
+    # Dark mode template
+    dark_template = go.layout.Template()
+    dark_template.layout = go.Layout(
+        plot_bgcolor=COLORS_DARK["background"],
+        paper_bgcolor=COLORS_DARK["background"],
+        font={"family": "Roboto, 'Helvetica Neue', sans-serif", "color": COLORS_DARK["text"]},
+        xaxis={
+            "gridcolor": "rgba(255, 255, 255, 0.1)",
+            "zerolinecolor": "rgba(255, 255, 255, 0.2)",
+            "color": COLORS_DARK["text"],
+        },
+        yaxis={
+            "gridcolor": "rgba(255, 255, 255, 0.1)",
+            "zerolinecolor": "rgba(255, 255, 255, 0.2)",
+            "color": COLORS_DARK["text"],
+        },
+        legend={"font": {"color": COLORS_DARK["text"]}},
+    )
+    pio.templates[PLOTLY_TEMPLATE_NAME_DARK] = dark_template
+
     pio.templates.default = PLOTLY_TEMPLATE_NAME
 
 
@@ -84,33 +124,80 @@ DASHBOARD_CSS = """
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: var(--text-color);
-    background: linear-gradient(135deg, #F5F7FA 0%, #E8EDF2 100%);
-    background-attachment: fixed;
+    background: #F5F7FA;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    position: relative;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image:
-        radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.04) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.04) 0%, transparent 50%),
-        radial-gradient(circle at 40% 20%, rgba(78, 205, 196, 0.03) 0%, transparent 50%);
-    pointer-events: none;
+#app-container {
+    position: relative;
+    min-height: 100vh;
     z-index: 0;
 }
 
-body > div {
+#app-container::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(78, 205, 196, 0.03) 0%, transparent 50%),
+        linear-gradient(135deg, #F5F7FA 0%, #E8EDF2 100%);
+    background-blend-mode: screen, screen, screen, normal;
+    pointer-events: none;
+    z-index: -1;
+}
+
+#app-container > * {
     position: relative;
     z-index: 1;
+}
+
+#main-content {
+    padding-top: 96px;
+}
+
+@media (max-width: 992px) {
+    #main-content {
+        padding-top: 120px;
+    }
+}
+
+#dark-mode-toggle-container {
+    position: fixed;
+    top: 24px;
+    right: 32px;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    box-shadow: var(--shadow-md);
+    transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+    color: var(--text-color);
+}
+
+#dark-mode-toggle-container .form-check {
+    margin: 0;
+}
+
+#dark-mode-toggle-container .form-switch .form-check-input {
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    #dark-mode-toggle-container {
+        top: 16px;
+        right: 16px;
+        gap: 8px;
+        padding: 8px 12px;
+    }
 }
 
 /* ===== TYPOGRAPHY ===== */
@@ -505,6 +592,11 @@ h5 { font-size: 1.1rem; font-weight: 600; }
     transition: all var(--transition-base);
 }
 
+.network-selector .Select-control {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 .Select-control:hover {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
@@ -859,6 +951,260 @@ footer {
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
+}
+
+/* ===== DARK MODE ===== */
+.dark-mode {
+    color-scheme: dark;
+}
+
+#app-container.dark-mode {
+    color: #E2E8F0;
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.08) 0%, transparent 55%),
+        radial-gradient(circle at 40% 20%, rgba(78, 205, 196, 0.06) 0%, transparent 55%),
+        linear-gradient(135deg, #0F1419 0%, #1A1F36 100%);
+    background-blend-mode: screen, screen, screen, normal;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+#app-container.dark-mode::before {
+    background:
+        radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.08) 0%, transparent 55%),
+        radial-gradient(circle at 40% 20%, rgba(78, 205, 196, 0.06) 0%, transparent 55%),
+        linear-gradient(135deg, #0F1419 0%, #1A1F36 100%);
+    background-blend-mode: screen, screen, screen, normal;
+}
+
+.dark-mode #dark-mode-toggle-container {
+    background: rgba(26, 31, 54, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 24px rgba(15, 20, 25, 0.45);
+    color: #E2E8F0;
+}
+
+.dark-mode .app-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.35) 0%, rgba(78, 205, 196, 0.25) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 18px 40px rgba(15, 20, 25, 0.55);
+}
+
+.dark-mode .app-header h1,
+.dark-mode .app-header p,
+.dark-mode .app-header label {
+    color: #E2E8F0 !important;
+}
+
+.dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
+    color: #E2E8F0;
+}
+
+.dark-mode .card {
+    background: #131C2C;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .card:hover {
+    border-color: rgba(78, 205, 196, 0.3);
+}
+
+.dark-mode #tabs {
+    background: #131C2C !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .tab-container {
+    background: #131C2C;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .tab {
+    color: #94A3B8;
+}
+
+.dark-mode .tab:hover {
+    color: #4ECDC4;
+    background-color: rgba(78, 205, 196, 0.1) !important;
+}
+
+.dark-mode .tab--selected {
+    color: #4ECDC4 !important;
+    background-color: rgba(78, 205, 196, 0.15) !important;
+}
+
+.dark-mode .sidebar-filter-panel {
+    background: rgba(26, 31, 54, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .sidebar-filter-panel h5,
+.dark-mode .sidebar-filter-panel label {
+    color: #E2E8F0;
+}
+
+.dark-mode .sidebar-filter-panel hr {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+.dark-mode .sidebar-filter-panel .form-check-label:hover {
+    color: #4ECDC4;
+}
+
+.dark-mode .Select-control {
+    background: rgba(15, 20, 25, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #E2E8F0;
+}
+
+.dark-mode .network-selector .Select-control {
+    background: rgba(26, 31, 54, 0.9);
+    border-color: rgba(78, 205, 196, 0.3);
+}
+
+.dark-mode .Select-control:hover {
+    border-color: #4ECDC4;
+}
+
+.dark-mode .kpi-card {
+    background: rgba(26, 31, 54, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .kpi-card:hover {
+    border-color: rgba(78, 205, 196, 0.3);
+}
+
+.dark-mode .kpi-value {
+    color: #E2E8F0;
+}
+
+.dark-mode .kpi-label {
+    color: #94A3B8;
+}
+
+.dark-mode .js-plotly-plot .plotly {
+    background: rgba(26, 31, 54, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .modebar {
+    background-color: rgba(15, 20, 25, 0.95) !important;
+}
+
+.dark-mode .modebar-btn:hover {
+    background-color: rgba(78, 205, 196, 0.2) !important;
+}
+
+.dark-mode #energy-balance-charts-container,
+.dark-mode #agg-energy-balance-charts-container,
+.dark-mode #capacity-charts-container,
+.dark-mode #capex-charts-container,
+.dark-mode #opex-charts-container {
+    background: #1C2437;
+}
+
+.dark-mode #network-metadata {
+    background: rgba(26, 31, 54, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-mode footer {
+    background: rgba(26, 31, 54, 0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .text-muted {
+    color: #94A3B8 !important;
+}
+
+.dark-mode .welcome-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(255, 107, 107, 0.12) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.dark-mode .welcome-feature {
+    background: rgba(26, 31, 54, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .network-item {
+    background: rgba(26, 31, 54, 0.9);
+    border-left: 4px solid #4ECDC4;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .network-item:hover {
+    border-left-color: #FF6B6B;
+}
+
+/* Dark mode toggle switch styling */
+.dark-mode .form-switch .form-check-input {
+    background-color: rgba(78, 205, 196, 0.3);
+    border-color: rgba(78, 205, 196, 0.5);
+}
+
+.dark-mode .form-switch .form-check-input:checked {
+    background-color: #4ECDC4;
+    border-color: #4ECDC4;
+}
+
+/* Dark mode - welcome page specific styling */
+/* Target the main welcome card wrapper */
+.dark-mode .card.mt-3 {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.dark-mode .card.mt-3 .card-body {
+    background: transparent !important;
+}
+
+/* Dark mode - feature badges in welcome hero */
+.dark-mode .welcome-card span {
+    background: rgba(26, 31, 54, 0.9) !important;
+    color: #E2E8F0 !important;
+    border: 1px solid rgba(78, 205, 196, 0.3);
+}
+
+/* Dark mode - network list heading */
+.dark-mode h3 {
+    color: #E2E8F0;
+}
+
+/* Dark mode - main container backgrounds */
+.dark-mode .container-fluid,
+.dark-mode .container {
+    background: transparent !important;
+}
+
+/* Dark mode - Enter Dashboard button */
+.dark-mode #enter-dashboard-btn {
+    background: linear-gradient(135deg, #4ECDC4 0%, #667EEA 100%) !important;
+    box-shadow: 0 8px 24px rgba(78, 205, 196, 0.4) !important;
+}
+
+.dark-mode #enter-dashboard-btn:hover {
+    background: linear-gradient(135deg, #3DB9B0 0%, #5568D3 100%) !important;
+    box-shadow: 0 12px 32px rgba(78, 205, 196, 0.5) !important;
+}
+
+/* Dark mode toggle label visibility */
+.dark-mode-toggle-label {
+    transition: color var(--transition-base);
+}
+
+.dark-mode .dark-mode-toggle-label {
+    color: #E2E8F0 !important;
+}
+
+/* Better contrast for dark mode toggle on welcome page */
+#dark-mode-toggle + label {
+    cursor: pointer;
 }
 """
 

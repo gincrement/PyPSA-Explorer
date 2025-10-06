@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 import pypsa
 from dash import Input, Output, dcc, html
 
+from pypsa_explorer.config import COLORS, COLORS_DARK, PLOTLY_TEMPLATE_NAME, PLOTLY_TEMPLATE_NAME_DARK
 from pypsa_explorer.layouts.components import NO_DATA_MSG, PLEASE_SELECT_CARRIER_MSG, create_error_message
 from pypsa_explorer.utils.helpers import get_carrier_nice_name, get_country_filter
 
@@ -34,9 +35,15 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             country_mode: str,
             selected_countries: list[str],
             selected_network_label: str,
+            is_dark_mode: bool,
         ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
             n = networks[selected_network_label]
             s = n.statistics
+
+            # Select colors and template based on dark mode
+            colors = COLORS_DARK if is_dark_mode else COLORS
+            bg_color = colors["background"]
+            template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
 
             if not selected_carriers:
                 return [PLEASE_SELECT_CARRIER_MSG] if aggregated else PLEASE_SELECT_CARRIER_MSG
@@ -80,8 +87,9 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                         fig.update_layout(
                             legend_title="Component Carrier",
                             hovermode="closest",
-                            paper_bgcolor="#F5F7FA",
-                            plot_bgcolor="#F5F7FA",
+                            paper_bgcolor=bg_color,
+                            plot_bgcolor=bg_color,
+                            template=template,
                         )
 
                     # Common title setting
@@ -97,13 +105,14 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                     if height:
                         fig.update_layout(
                             title=title,
-                            paper_bgcolor="#F5F7FA",
-                            plot_bgcolor="#F5F7FA",
+                            paper_bgcolor=bg_color,
+                            plot_bgcolor=bg_color,
+                            template=template,
                             height=height,
                             margin={"l": 50, "r": 50, "t": 100, "b": 50},
                         )
                     else:
-                        fig.update_layout(title=title, paper_bgcolor="#F5F7FA", plot_bgcolor="#F5F7FA")
+                        fig.update_layout(title=title, paper_bgcolor=bg_color, plot_bgcolor=bg_color, template=template)
 
                     # Add explicit height constraint to prevent growth
                     graph_style = {"height": f"{height}px"} if height else {}
@@ -131,6 +140,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("dark-mode-toggle", "value"),
         ],
     )
     def update_energy_balance(
@@ -138,9 +148,11 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
         country_mode: str,
         selected_countries: list[str],
         selected_network_label: str,
+        toggle_value: list[str],
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
+        is_dark_mode = "dark" in (toggle_value or [])
         return create_energy_balance_callback(aggregated=False)(
-            selected_carriers, country_mode, selected_countries, selected_network_label
+            selected_carriers, country_mode, selected_countries, selected_network_label, is_dark_mode
         )
 
     # Callback for Aggregated Energy Balance charts
@@ -151,6 +163,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("dark-mode-toggle", "value"),
         ],
     )
     def update_energy_balance_aggregated(
@@ -158,9 +171,11 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
         country_mode: str,
         selected_countries: list[str],
         selected_network_label: str,
+        toggle_value: list[str],
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
+        is_dark_mode = "dark" in (toggle_value or [])
         return create_energy_balance_callback(aggregated=True)(
-            selected_carriers, country_mode, selected_countries, selected_network_label
+            selected_carriers, country_mode, selected_countries, selected_network_label, is_dark_mode
         )
 
     # Callback for Capacity charts
@@ -171,6 +186,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("dark-mode-toggle", "value"),
         ],
     )
     def update_capacity_charts(
@@ -178,9 +194,16 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
         country_mode: str,
         selected_countries: list[str],
         selected_network_label: str,
+        toggle_value: list[str],
     ) -> list[dcc.Graph | html.Div]:
         n = networks[selected_network_label]
         s = n.statistics
+
+        # Select colors and template based on dark mode
+        is_dark_mode = "dark" in (toggle_value or [])
+        colors = COLORS_DARK if is_dark_mode else COLORS
+        bg_color = colors["background"]
+        template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
 
         if not selected_carriers:
             return [PLEASE_SELECT_CARRIER_MSG]
@@ -214,7 +237,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                     countries_str = ", ".join(selected_countries)
                     title += f" (Countries: {countries_str})"
 
-                fig.update_layout(title=title, paper_bgcolor="#F5F7FA", plot_bgcolor="#F5F7FA")
+                fig.update_layout(title=title, paper_bgcolor=bg_color, plot_bgcolor=bg_color, template=template)
 
                 # Add the graph without wrapping in dbc.Col so it takes full width
                 charts.append(dcc.Graph(figure=fig, className="mb-4"))
@@ -236,13 +259,20 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("dark-mode-toggle", "value"),
         ],
     )
     def update_capex_charts(
-        country_mode: str, selected_countries: list[str], selected_network_label: str
+        country_mode: str, selected_countries: list[str], selected_network_label: str, toggle_value: list[str]
     ) -> list[dcc.Graph | html.Div]:
         n = networks[selected_network_label]
         s = n.statistics
+
+        # Select colors and template based on dark mode
+        is_dark_mode = "dark" in (toggle_value or [])
+        colors = COLORS_DARK if is_dark_mode else COLORS
+        bg_color = colors["background"]
+        template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
 
         # Use helper for country filtering
         query, facet_col, error_message = get_country_filter(country_mode, selected_countries)
@@ -273,8 +303,9 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                 title=title,
                 height=1000,
                 margin={"l": 50, "r": 50, "t": 100, "b": 50},
-                paper_bgcolor="#F5F7FA",
-                plot_bgcolor="#F5F7FA",
+                paper_bgcolor=bg_color,
+                plot_bgcolor=bg_color,
+                template=template,
             )
 
             # Return the graph with explicit height in component
@@ -297,13 +328,20 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("dark-mode-toggle", "value"),
         ],
     )
     def update_opex_charts(
-        country_mode: str, selected_countries: list[str], selected_network_label: str
+        country_mode: str, selected_countries: list[str], selected_network_label: str, toggle_value: list[str]
     ) -> list[dcc.Graph | html.Div]:
         n = networks[selected_network_label]
         s = n.statistics
+
+        # Select colors and template based on dark mode
+        is_dark_mode = "dark" in (toggle_value or [])
+        colors = COLORS_DARK if is_dark_mode else COLORS
+        bg_color = colors["background"]
+        template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
 
         # Use helper for country filtering
         query, facet_col, error_message = get_country_filter(country_mode, selected_countries)
@@ -334,8 +372,9 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                 title=title,
                 height=1000,
                 margin={"l": 50, "r": 50, "t": 100, "b": 50},
-                paper_bgcolor="#F5F7FA",
-                plot_bgcolor="#F5F7FA",
+                paper_bgcolor=bg_color,
+                plot_bgcolor=bg_color,
+                template=template,
             )
 
             # Return the graph with explicit height in component

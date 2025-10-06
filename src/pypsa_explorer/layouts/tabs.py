@@ -13,10 +13,9 @@ TAB_STYLE = {
 
 TAB_SELECTED_STYLE = {
     "padding": "12px 16px",
-    "backgroundColor": "#F5F7FA",
+    "backgroundColor": "transparent",
     "border": "none",
-    "borderBottom": "3px solid #0066CC",
-    "color": "#0066CC",
+    "borderBottom": "3px solid transparent",
 }
 
 
