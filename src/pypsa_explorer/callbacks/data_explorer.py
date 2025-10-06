@@ -4,6 +4,8 @@ import pandas as pd
 import pypsa
 from dash import Input, Output, State, ctx, no_update
 
+from pypsa_explorer.utils.data_table import dataframe_to_datatable, get_timeseries_attributes
+
 # Mapping of KPI card IDs to component names
 KPI_COMPONENT_MAP = {
     "kpi-card-buses": "buses",
@@ -36,6 +38,7 @@ def register_data_explorer_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Output("static-data-table", "columns"),
             Output("timeseries-attribute-selector", "options"),
             Output("timeseries-attribute-selector", "value"),
+            Output("active-component-store", "data"),
         ],
         [
             Input("kpi-card-buses", "n_clicks"),
@@ -68,11 +71,11 @@ def register_data_explorer_callbacks(app, networks: dict[str, pypsa.Network]) ->
 
         # If close button was clicked, close the modal
         if triggered_id == "close-data-explorer-modal":
-            return False, no_update, no_update, no_update, no_update, no_update
+            return False, no_update, no_update, no_update, no_update, no_update, no_update
 
         # If no KPI card was clicked, don't update
         if triggered_id not in KPI_COMPONENT_MAP:
-            return no_update, no_update, no_update, no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
         # Get the component name from the triggered card
         component_name = KPI_COMPONENT_MAP[triggered_id]
@@ -90,39 +93,30 @@ def register_data_explorer_callbacks(app, networks: dict[str, pypsa.Network]) ->
                 [],
                 [],
                 None,
+                component_name,
             )
 
         component_df = getattr(n, component_name)
 
-        # Convert dataframe to dict for DataTable
+        # Convert dataframe to dict for DataTable using utility
         if isinstance(component_df, pd.DataFrame):
-            # Reset index to include it as a column
-            df_reset = component_df.reset_index()
-            data = df_reset.to_dict("records")
-            columns = [{"name": col, "id": col} for col in df_reset.columns]
+            data, columns = dataframe_to_datatable(component_df)
         else:
             data = []
             columns = []
 
-        # Get available time-series attributes
-        timeseries_component = f"{component_name}_t"
-        timeseries_options = []
-
-        if hasattr(n, timeseries_component):
-            ts_obj = getattr(n, timeseries_component)
-            # Get all attributes that are DataFrames
-            timeseries_attrs = [
-                attr for attr in dir(ts_obj) if not attr.startswith("_") and isinstance(getattr(ts_obj, attr), pd.DataFrame)
-            ]
-            timeseries_options = [{"label": attr, "value": attr} for attr in timeseries_attrs]
+        # Get available time-series attributes using efficient utility
+        timeseries_attrs = get_timeseries_attributes(n, component_name)
+        timeseries_options = [{"label": attr, "value": attr} for attr in timeseries_attrs]
 
         return (
             True,  # Open modal
-            f"{component_label} Data ({len(component_df)} records)",
+            f"{component_label} Data ({len(component_df):,} records)",
             data,
             columns,
             timeseries_options,
             timeseries_options[0]["value"] if timeseries_options else None,
+            component_name,  # Store component name for efficient lookup
         )
 
     @app.callback(
@@ -134,31 +128,17 @@ def register_data_explorer_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("timeseries-attribute-selector", "value"),
         ],
         [
-            State("data-explorer-modal-title", "children"),
+            State("active-component-store", "data"),
             State("network-selector", "value"),
         ],
     )
     def update_timeseries_data(
         selected_attribute: str | None,
-        modal_title: str,
+        component_name: str | None,
         network_label: str,
     ) -> tuple:
         """Update time-series data table when attribute is selected."""
-        if not selected_attribute:
-            return [], []
-
-        # Extract component name from modal title
-        # Modal title format: "{Component Label} Data ({count} records)"
-        component_label = modal_title.split(" Data")[0]
-
-        # Reverse lookup to get component name from label
-        component_name = None
-        for name, label in COMPONENT_LABELS.items():
-            if label == component_label:
-                component_name = name
-                break
-
-        if not component_name:
+        if not selected_attribute or not component_name:
             return [], []
 
         # Get the active network
@@ -176,10 +156,8 @@ def register_data_explorer_callbacks(app, networks: dict[str, pypsa.Network]) ->
         ts_df = getattr(ts_obj, selected_attribute)
 
         if isinstance(ts_df, pd.DataFrame):
-            # Reset index to include timestamps as a column
-            df_reset = ts_df.reset_index()
-            data = df_reset.to_dict("records")
-            columns = [{"name": col, "id": col} for col in df_reset.columns]
+            # Use utility function for efficient conversion with uniform sampling
+            data, columns = dataframe_to_datatable(ts_df, max_rows=5000)
             return data, columns
 
         return [], []
