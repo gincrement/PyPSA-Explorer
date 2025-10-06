@@ -110,7 +110,7 @@ DATATABLE_BASE_CONFIG = {
     },
     "style_header": {
         "fontWeight": "600",
-        "backgroundColor": "#f8f9fa",
+        "backgroundColor": "#FAFBFC",
         "position": "sticky",
         "top": 0,
         "zIndex": 1,
@@ -118,7 +118,7 @@ DATATABLE_BASE_CONFIG = {
     "style_data_conditional": [
         {
             "if": {"row_index": "odd"},
-            "backgroundColor": "#f8f9fa",
+            "backgroundColor": "#FAFBFC",
         }
     ],
     "export_format": "csv",

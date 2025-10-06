@@ -80,8 +80,8 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                         fig.update_layout(
                             legend_title="Component Carrier",
                             hovermode="closest",
-                            paper_bgcolor="#f5f7fa",
-                            plot_bgcolor="#f5f7fa",
+                            paper_bgcolor="#F5F7FA",
+                            plot_bgcolor="#F5F7FA",
                         )
 
                     # Common title setting
@@ -97,13 +97,13 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                     if height:
                         fig.update_layout(
                             title=title,
-                            paper_bgcolor="#f5f7fa",
-                            plot_bgcolor="#f5f7fa",
+                            paper_bgcolor="#F5F7FA",
+                            plot_bgcolor="#F5F7FA",
                             height=height,
                             margin={"l": 50, "r": 50, "t": 100, "b": 50},
                         )
                     else:
-                        fig.update_layout(title=title, paper_bgcolor="#f5f7fa", plot_bgcolor="#f5f7fa")
+                        fig.update_layout(title=title, paper_bgcolor="#F5F7FA", plot_bgcolor="#F5F7FA")
 
                     # Add explicit height constraint to prevent growth
                     graph_style = {"height": f"{height}px"} if height else {}
@@ -214,7 +214,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                     countries_str = ", ".join(selected_countries)
                     title += f" (Countries: {countries_str})"
 
-                fig.update_layout(title=title, paper_bgcolor="#f5f7fa", plot_bgcolor="#f5f7fa")
+                fig.update_layout(title=title, paper_bgcolor="#F5F7FA", plot_bgcolor="#F5F7FA")
 
                 # Add the graph without wrapping in dbc.Col so it takes full width
                 charts.append(dcc.Graph(figure=fig, className="mb-4"))
@@ -273,8 +273,8 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                 title=title,
                 height=1000,
                 margin={"l": 50, "r": 50, "t": 100, "b": 50},
-                paper_bgcolor="#f5f7fa",
-                plot_bgcolor="#f5f7fa",
+                paper_bgcolor="#F5F7FA",
+                plot_bgcolor="#F5F7FA",
             )
 
             # Return the graph with explicit height in component
@@ -334,8 +334,8 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                 title=title,
                 height=1000,
                 margin={"l": 50, "r": 50, "t": 100, "b": 50},
-                paper_bgcolor="#f5f7fa",
-                plot_bgcolor="#f5f7fa",
+                paper_bgcolor="#F5F7FA",
+                plot_bgcolor="#F5F7FA",
             )
 
             # Return the graph with explicit height in component

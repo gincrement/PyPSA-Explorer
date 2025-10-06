@@ -13,10 +13,10 @@ TAB_STYLE = {
 
 TAB_SELECTED_STYLE = {
     "padding": "12px 16px",
-    "backgroundColor": "#f5f7fa",
+    "backgroundColor": "#F5F7FA",
     "border": "none",
-    "borderBottom": "3px solid #3498db",
-    "color": "#3498db",
+    "borderBottom": "3px solid #0066CC",
+    "color": "#0066CC",
 }
 
 
@@ -139,7 +139,7 @@ def create_network_map_tab() -> dcc.Tab:
                                             style={
                                                 "width": "100%",
                                                 "height": "700px",
-                                                "border": "1px solid #ddd",
+                                                "border": "1px solid #E2E8F0",
                                             },
                                         ),
                                         html.Div(

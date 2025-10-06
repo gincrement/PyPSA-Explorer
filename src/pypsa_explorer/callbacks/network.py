@@ -69,7 +69,7 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network]) -> None:
             return html.Pre(
                 metadata_yaml,
                 style={
-                    "background-color": "#f8f9fa",
+                    "background-color": "#FAFBFC",
                     "padding": "10px",
                     "border-radius": "5px",
                     "color": "var(--text-color)",

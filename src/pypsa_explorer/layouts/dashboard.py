@@ -97,10 +97,10 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
                                         dcc.Tabs(
                                             id="tabs",
                                             style={
-                                                "borderBottom": "2px solid #f8f9fa",
+                                                "borderBottom": "2px solid #FAFBFC",
                                                 "marginBottom": "20px",
                                             },
-                                            parent_style={"backgroundColor": "#f5f7fa"},
+                                            parent_style={"backgroundColor": "#F5F7FA"},
                                             children=[
                                                 create_energy_balance_tab(),
                                                 create_energy_balance_aggregated_tab(),

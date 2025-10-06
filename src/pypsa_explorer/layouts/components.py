@@ -12,7 +12,7 @@ from pypsa_explorer.utils.data_table import DATATABLE_BASE_CONFIG
 PLEASE_SELECT_CARRIER_MSG = html.Div(
     [
         html.Div(
-            [html.I(className="fas fa-filter", style={"fontSize": "3rem", "color": "#00bcd4", "marginBottom": "20px"})],
+            [html.I(className="fas fa-filter", style={"fontSize": "3rem", "color": "#4ECDC4", "marginBottom": "20px"})],
         ),
         html.H4("Select Carriers", style={"marginBottom": "12px", "fontWeight": "600"}),
         html.P(
@@ -25,14 +25,14 @@ PLEASE_SELECT_CARRIER_MSG = html.Div(
     style={
         "background": "rgba(255, 255, 255, 0.8)",
         "borderRadius": "16px",
-        "border": "2px dashed rgba(0, 188, 212, 0.3)",
+        "border": "2px dashed rgba(78, 205, 196, 0.3)",
     },
 )
 
 PLEASE_SELECT_COUNTRY_MSG = html.Div(
     [
         html.Div(
-            [html.I(className="fas fa-globe", style={"fontSize": "3rem", "color": "#00bcd4", "marginBottom": "20px"})],
+            [html.I(className="fas fa-globe", style={"fontSize": "3rem", "color": "#4ECDC4", "marginBottom": "20px"})],
         ),
         html.H4("Select Countries", style={"marginBottom": "12px", "fontWeight": "600"}),
         html.P(
@@ -45,7 +45,7 @@ PLEASE_SELECT_COUNTRY_MSG = html.Div(
     style={
         "background": "rgba(255, 255, 255, 0.8)",
         "borderRadius": "16px",
-        "border": "2px dashed rgba(0, 188, 212, 0.3)",
+        "border": "2px dashed rgba(78, 205, 196, 0.3)",
     },
 )
 
@@ -55,7 +55,7 @@ NO_DATA_MSG = html.Div(
             [
                 html.I(
                     className="fas fa-database",
-                    style={"fontSize": "3rem", "color": "#ff6f00", "marginBottom": "20px"},
+                    style={"fontSize": "3rem", "color": "#FFB84D", "marginBottom": "20px"},
                 )
             ],
         ),
@@ -70,7 +70,7 @@ NO_DATA_MSG = html.Div(
     style={
         "background": "rgba(255, 255, 255, 0.8)",
         "borderRadius": "16px",
-        "border": "2px dashed rgba(255, 111, 0, 0.3)",
+        "border": "2px dashed rgba(255, 184, 77, 0.3)",
     },
 )
 
@@ -100,7 +100,7 @@ def create_error_message(context: str, error: Exception) -> html.Div:
             html.P(str(error), className="text-muted"),
         ],
         className="text-center p-5 border rounded mb-4",
-        style={"background-color": "#f8f9fa"},
+        style={"background-color": "#FAFBFC"},
     )
 
 
