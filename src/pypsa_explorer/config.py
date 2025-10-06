@@ -153,6 +153,20 @@ h5 { font-size: 1.1rem; font-weight: 600; }
 }
 
 /* ===== TABS ===== */
+/* Tabs parent container - the outer wrapper */
+#tabs {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    background: white !important;
+    box-shadow: var(--shadow-md);
+}
+
+/* Ensure the parent div wrapper also has rounded corners */
+#tabs > div {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+}
+
 .tab-container {
     border-bottom: 2px solid rgba(0, 0, 0, 0.06);
     background: white;
@@ -348,6 +362,36 @@ h5 { font-size: 1.1rem; font-weight: 600; }
     transform: translateX(8px);
     box-shadow: var(--shadow-md);
     border-left-color: var(--secondary-color);
+}
+
+/* Enter Dashboard Button */
+#enter-dashboard-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+#enter-dashboard-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+#enter-dashboard-btn:hover::before {
+    left: 100%;
+}
+
+#enter-dashboard-btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(0, 102, 204, 0.4) !important;
+}
+
+#enter-dashboard-btn:active {
+    transform: translateY(-2px) scale(1);
 }
 
 /* ===== SIDEBAR - GLASS MORPHISM ===== */

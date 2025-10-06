@@ -100,7 +100,11 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
                                                 "borderBottom": "2px solid #FAFBFC",
                                                 "marginBottom": "20px",
                                             },
-                                            parent_style={"backgroundColor": "#F5F7FA"},
+                                            parent_style={
+                                                "backgroundColor": "#F5F7FA",
+                                                "borderRadius": "16px",
+                                                "overflow": "hidden",
+                                            },
                                             children=[
                                                 create_energy_balance_tab(),
                                                 create_energy_balance_aggregated_tab(),

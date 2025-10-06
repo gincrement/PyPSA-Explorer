@@ -229,11 +229,23 @@ def create_welcome_page(network_labels: list[str], networks_info: dict[str, dict
                         html.Div(
                             [
                                 dbc.Button(
-                                    "Enter Dashboard",
+                                    [
+                                        html.I(className="fas fa-rocket", style={"marginRight": "10px"}),
+                                        "Enter Dashboard",
+                                    ],
                                     id="enter-dashboard-btn",
-                                    color="primary",
                                     size="lg",
                                     className="mt-4",
+                                    style={
+                                        "background": "linear-gradient(135deg, #0066CC 0%, #4ECDC4 100%)",
+                                        "border": "none",
+                                        "padding": "16px 48px",
+                                        "fontSize": "1.1rem",
+                                        "fontWeight": "600",
+                                        "borderRadius": "50px",
+                                        "boxShadow": "0 8px 24px rgba(0, 102, 204, 0.3)",
+                                        "transition": "all 0.3s ease",
+                                    },
                                 )
                             ],
                             className="text-center mt-4 mb-5",
