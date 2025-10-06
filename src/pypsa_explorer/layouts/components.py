@@ -76,7 +76,7 @@ NO_DATA_MSG = html.Div(
 
 
 def create_dark_mode_toggle() -> html.Div:
-    """Create a global dark mode toggle control."""
+    """Create the dark mode toggle control."""
 
     return html.Div(
         [
@@ -95,10 +95,42 @@ def create_dark_mode_toggle() -> html.Div:
                 switch=True,
                 persistence=True,
                 persistence_type="local",
-                style={"transform": "scale(1.1)"},
+                style={"transform": "scale(1.05)"},
             ),
         ],
         id="dark-mode-toggle-container",
+        className="dark-mode-toggle",
+    )
+
+
+def create_utility_bar(active_network_label: str, network_count: int) -> html.Div:
+    """Create a top utility bar with global controls."""
+
+    return html.Div(
+        [
+            html.Div(
+                [
+                    html.Span("Active network", className="utility-label"),
+                    html.Span(
+                        active_network_label,
+                        className="utility-badge",
+                    ),
+                    html.Span(
+                        f"{network_count} loaded" if network_count != 1 else "1 loaded",
+                        className="utility-meta text-muted",
+                    ),
+                ],
+                className="utility-bar__meta",
+            ),
+            html.Div(
+                [
+                    html.Span("Display", className="utility-label d-none d-md-inline"),
+                    create_dark_mode_toggle(),
+                ],
+                className="utility-bar__controls",
+            ),
+        ],
+        className="utility-bar",
     )
 
 

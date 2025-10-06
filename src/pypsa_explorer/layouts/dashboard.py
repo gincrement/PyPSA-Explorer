@@ -7,10 +7,10 @@ from dash import dcc, html
 from pypsa_explorer.config import DEFAULT_CARRIERS
 from pypsa_explorer.layouts.components import (
     create_data_explorer_modal,
-    create_dark_mode_toggle,
     create_footer,
     create_header,
     create_sidebar_filter_panel,
+    create_utility_bar,
 )
 from pypsa_explorer.layouts.tabs import (
     create_capacity_tab,
@@ -69,7 +69,7 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
                 id="app-container",
                 className="",
                 children=[
-                    create_dark_mode_toggle(),
+                    create_utility_bar(active_network_label, len(network_labels)),
                     html.Div(
                         id="main-content",
                         className="fade-in",
