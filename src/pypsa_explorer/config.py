@@ -170,8 +170,8 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 24px;
-    padding: 12px 24px;
+    margin-bottom: 16px;
+    padding: 8px 20px;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 16px;
@@ -401,7 +401,7 @@ h5 { font-size: 1.1rem; font-weight: 600; }
 /* ===== WELCOME PAGE ===== */
 .welcome-card {
     text-align: center;
-    padding: 60px 40px;
+    padding: 48px 36px;
     border-radius: 20px;
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(255, 107, 107, 0.08) 100%);
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -1029,9 +1029,9 @@ footer {
 }
 
 .dark-mode .utility-bar {
-    background: rgba(26, 31, 54, 0.88);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 18px 40px rgba(15, 20, 25, 0.55);
+    background: rgba(26, 31, 54, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 14px 32px rgba(15, 20, 25, 0.45);
 }
 
 .dark-mode .utility-label {
@@ -1189,8 +1189,8 @@ footer {
 }
 
 .dark-mode .welcome-card {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(255, 107, 107, 0.12) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(255, 107, 107, 0.1) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .dark-mode .welcome-feature {
