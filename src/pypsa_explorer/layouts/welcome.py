@@ -30,8 +30,8 @@ def create_welcome_page(network_labels: list[str], networks_info: dict[str, dict
                         style={
                             "height": "60px",
                             "position": "absolute",
-                            "top": "15px",
-                            "right": "15px",
+                            "top": "35px",
+                            "right": "35px",
                             "zIndex": "10",
                         },
                     ),
