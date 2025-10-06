@@ -92,9 +92,22 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                         countries_str = ", ".join(selected_countries)
                         title += f" (Countries: {countries_str})"
 
-                    fig.update_layout(title=title, paper_bgcolor="#f5f7fa", plot_bgcolor="#f5f7fa")
+                    # Apply robust height settings to prevent resizing
+                    height = 500 if not aggregated else None
+                    if height:
+                        fig.update_layout(
+                            title=title,
+                            paper_bgcolor="#f5f7fa",
+                            plot_bgcolor="#f5f7fa",
+                            height=height,
+                            margin={"l": 50, "r": 50, "t": 100, "b": 50},
+                        )
+                    else:
+                        fig.update_layout(title=title, paper_bgcolor="#f5f7fa", plot_bgcolor="#f5f7fa")
 
-                    graph_component = dcc.Graph(figure=fig)
+                    # Add explicit height constraint to prevent growth
+                    graph_style = {"height": f"{height}px"} if height else {}
+                    graph_component = dcc.Graph(figure=fig, style=graph_style, className="mb-4")
                     charts.append(graph_component)
 
                 except Exception as e:

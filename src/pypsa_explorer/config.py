@@ -634,6 +634,16 @@ footer {
     font-weight: 700;
 }
 
+/* Network selector dropdown styling */
+#network-selector .Select-value {
+    background: white !important;
+    color: var(--text-color) !important;
+}
+
+#network-selector .Select-value-label {
+    color: var(--text-color) !important;
+}
+
 /* ===== KPI CARDS ===== */
 .kpi-card {
     background: white;

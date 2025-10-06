@@ -6,6 +6,8 @@ import dash_bootstrap_components as dbc
 import pypsa
 from dash import dash_table, dcc, html
 
+from pypsa_explorer.utils.data_table import DATATABLE_BASE_CONFIG
+
 # Standard message components with enhanced visuals
 PLEASE_SELECT_CARRIER_MSG = html.Div(
     [
@@ -164,7 +166,8 @@ def create_header(n: pypsa.Network, network_labels: list[str], active_network_la
                                     clearable=False,
                                     style={
                                         "borderRadius": "10px",
-                                        "border": "none",
+                                        "border": "1px solid rgba(255, 255, 255, 0.3)",
+                                        "backgroundColor": "rgba(255, 255, 255, 0.95)",
                                     },
                                 ),
                             ],
@@ -434,6 +437,8 @@ def create_data_explorer_modal() -> dbc.Modal:
     """
     return dbc.Modal(
         [
+            # Store for tracking active component (avoids fragile string parsing)
+            dcc.Store(id="active-component-store", data=None),
             dbc.ModalHeader(
                 dbc.ModalTitle(id="data-explorer-modal-title", children="Component Data"),
                 close_button=True,
@@ -455,32 +460,7 @@ def create_data_explorer_modal() -> dbc.Modal:
                                         children=[
                                             dash_table.DataTable(
                                                 id="static-data-table",
-                                                sort_action="native",
-                                                filter_action="native",
-                                                style_table={
-                                                    "overflowX": "auto",
-                                                    "overflowY": "auto",
-                                                    "maxHeight": "500px",
-                                                },
-                                                style_cell={
-                                                    "textAlign": "left",
-                                                    "padding": "8px",
-                                                    "fontSize": "0.9rem",
-                                                },
-                                                style_header={
-                                                    "fontWeight": "600",
-                                                    "backgroundColor": "#f8f9fa",
-                                                    "position": "sticky",
-                                                    "top": 0,
-                                                    "zIndex": 1,
-                                                },
-                                                style_data_conditional=[
-                                                    {
-                                                        "if": {"row_index": "odd"},
-                                                        "backgroundColor": "#f8f9fa",
-                                                    }
-                                                ],
-                                                export_format="csv",
+                                                **DATATABLE_BASE_CONFIG,
                                             )
                                         ],
                                     )
@@ -503,7 +483,14 @@ def create_data_explorer_modal() -> dbc.Modal:
                                                     dcc.Dropdown(
                                                         id="timeseries-attribute-selector",
                                                         placeholder="Select time-series attribute...",
-                                                        className="mb-3",
+                                                        className="mb-2",
+                                                    ),
+                                                    html.Small(
+                                                        [
+                                                            html.I(className="fas fa-info-circle me-1"),
+                                                            "Large datasets (>5000 rows) are sampled for display. Use CSV export for full data.",
+                                                        ],
+                                                        className="text-muted d-block mb-3",
                                                     ),
                                                 ],
                                                 id="timeseries-controls",
@@ -514,32 +501,7 @@ def create_data_explorer_modal() -> dbc.Modal:
                                                 children=[
                                                     dash_table.DataTable(
                                                         id="timeseries-data-table",
-                                                        sort_action="native",
-                                                        filter_action="native",
-                                                        style_table={
-                                                            "overflowX": "auto",
-                                                            "overflowY": "auto",
-                                                            "maxHeight": "500px",
-                                                        },
-                                                        style_cell={
-                                                            "textAlign": "left",
-                                                            "padding": "8px",
-                                                            "fontSize": "0.9rem",
-                                                        },
-                                                        style_header={
-                                                            "fontWeight": "600",
-                                                            "backgroundColor": "#f8f9fa",
-                                                            "position": "sticky",
-                                                            "top": 0,
-                                                            "zIndex": 1,
-                                                        },
-                                                        style_data_conditional=[
-                                                            {
-                                                                "if": {"row_index": "odd"},
-                                                                "backgroundColor": "#f8f9fa",
-                                                            }
-                                                        ],
-                                                        export_format="csv",
+                                                        **DATATABLE_BASE_CONFIG,
                                                     )
                                                 ],
                                             ),
