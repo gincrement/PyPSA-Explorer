@@ -62,6 +62,8 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
         children=[
             # Store component to manage page state
             dcc.Store(id="page-state", data={"current_page": "welcome"}),
+            # Store component for dark mode state (cached)
+            dcc.Store(id="dark-mode-store", data=False),
             # Data explorer modal
             create_data_explorer_modal(),
             # Main application layout with conditional display

@@ -2,10 +2,11 @@
 
 from collections.abc import Callable
 
+import dash
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import pypsa
-from dash import Input, Output, dcc, html
+from dash import Input, Output, ctx, dcc, html
 
 from pypsa_explorer.config import COLORS, COLORS_DARK, PLOTLY_TEMPLATE_NAME, PLOTLY_TEMPLATE_NAME_DARK
 from pypsa_explorer.layouts.components import NO_DATA_MSG, PLEASE_SELECT_CARRIER_MSG, create_error_message
@@ -140,17 +141,23 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
-            Input("dark-mode-toggle", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_energy_balance(
         selected_carriers: list[str],
         country_mode: str,
         selected_countries: list[str],
         selected_network_label: str,
-        toggle_value: list[str],
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
-        is_dark_mode = "dark" in (toggle_value or [])
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "energy-balance" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         return create_energy_balance_callback(aggregated=False)(
             selected_carriers, country_mode, selected_countries, selected_network_label, is_dark_mode
         )
@@ -163,17 +170,23 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
-            Input("dark-mode-toggle", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_energy_balance_aggregated(
         selected_carriers: list[str],
         country_mode: str,
         selected_countries: list[str],
         selected_network_label: str,
-        toggle_value: list[str],
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
-        is_dark_mode = "dark" in (toggle_value or [])
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "energy-balance-aggregated" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         return create_energy_balance_callback(aggregated=True)(
             selected_carriers, country_mode, selected_countries, selected_network_label, is_dark_mode
         )
@@ -186,21 +199,27 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
-            Input("dark-mode-toggle", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_capacity_charts(
         selected_carriers: list[str],
         country_mode: str,
         selected_countries: list[str],
         selected_network_label: str,
-        toggle_value: list[str],
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dcc.Graph | html.Div]:
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "capacity" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         n = networks[selected_network_label]
         s = n.statistics
 
         # Select colors and template based on dark mode
-        is_dark_mode = "dark" in (toggle_value or [])
         colors = COLORS_DARK if is_dark_mode else COLORS
         bg_color = colors["background"]
         template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
@@ -259,17 +278,26 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
-            Input("dark-mode-toggle", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_capex_charts(
-        country_mode: str, selected_countries: list[str], selected_network_label: str, toggle_value: list[str]
+        country_mode: str,
+        selected_countries: list[str],
+        selected_network_label: str,
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dcc.Graph | html.Div]:
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "capex" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         n = networks[selected_network_label]
         s = n.statistics
 
         # Select colors and template based on dark mode
-        is_dark_mode = "dark" in (toggle_value or [])
         colors = COLORS_DARK if is_dark_mode else COLORS
         bg_color = colors["background"]
         template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
@@ -328,17 +356,26 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
-            Input("dark-mode-toggle", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_opex_charts(
-        country_mode: str, selected_countries: list[str], selected_network_label: str, toggle_value: list[str]
+        country_mode: str,
+        selected_countries: list[str],
+        selected_network_label: str,
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dcc.Graph | html.Div]:
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "opex" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         n = networks[selected_network_label]
         s = n.statistics
 
         # Select colors and template based on dark mode
-        is_dark_mode = "dark" in (toggle_value or [])
         colors = COLORS_DARK if is_dark_mode else COLORS
         bg_color = colors["background"]
         template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME

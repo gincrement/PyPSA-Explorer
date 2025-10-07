@@ -1,6 +1,6 @@
 """Theme callbacks for dark mode toggle."""
 
-from dash import Input, Output, callback
+from dash import Input, Output
 
 
 def register_theme_callbacks(app) -> None:
@@ -13,13 +13,13 @@ def register_theme_callbacks(app) -> None:
         The Dash application instance
     """
 
-    @callback(
-        Output("app-container", "className"),
+    @app.callback(
+        [Output("app-container", "className"), Output("dark-mode-store", "data")],
         Input("dark-mode-toggle", "value"),
         prevent_initial_call=False,
     )
     def toggle_dark_mode(toggle_value):
-        """Apply the appropriate theme class based on toggle state."""
+        """Apply the appropriate theme class based on toggle state and update store."""
 
         is_dark = "dark" in (toggle_value or [])
-        return "dark-mode" if is_dark else ""
+        return ("dark-mode" if is_dark else "", is_dark)

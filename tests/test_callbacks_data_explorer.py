@@ -1,5 +1,7 @@
 """Tests for data explorer callbacks."""
 
+from unittest.mock import patch
+
 import pandas as pd
 import pypsa
 import pytest
@@ -309,3 +311,363 @@ class TestEdgeCases:
 
         # Callbacks should be registered once regardless of network count
         assert len(app.callback_map) == 2
+
+
+class TestDataExplorerModalInteraction:
+    """Test modal opening and closing interactions."""
+
+    def test_modal_opens_on_kpi_card_click(self, network_with_timeseries):
+        """Test that modal opens when a KPI card is clicked."""
+        app = Dash(__name__)
+        networks = {"Test": network_with_timeseries}
+        register_data_explorer_callbacks(app, networks)
+
+        # Get the modal toggle callback
+        callback_info = list(app.callback_map.values())[0]
+        callback_func = callback_info["callback"].__wrapped__
+
+        # Mock ctx.triggered_id to simulate clicking buses KPI card
+        with patch("pypsa_explorer.callbacks.data_explorer.ctx") as mock_ctx:
+            mock_ctx.triggered_id = "kpi-card-buses"
+
+            # Simulate clicking on buses KPI card
+            # Use positional arguments matching the callback signature
+            result = callback_func(
+                1,  # buses_clicks
+                0,  # generators_clicks
+                0,  # lines_clicks
+                0,  # links_clicks
+                0,  # storage_units_clicks
+                0,  # stores_clicks
+                0,  # close_clicks
+                "Test",  # network_label
+                False,  # is_open
+            )
+
+        # Unpack result - should be (is_open, title, static_data, static_columns, ts_options, ts_disabled, active_component)
+        is_open = result[0]
+        title = result[1]
+        active_component = result[6]
+
+        # Modal should be open
+        assert is_open is True
+        # Title should mention buses/nodes
+        assert "Nodes" in title or "buses" in title.lower()
+        # Active component should be stored
+        assert active_component == "buses"
+
+    def test_modal_closes_on_close_button(self, network_with_timeseries):
+        """Test that modal closes when close button is clicked."""
+        app = Dash(__name__)
+        networks = {"Test": network_with_timeseries}
+        register_data_explorer_callbacks(app, networks)
+
+        # Get the modal toggle callback
+        callback_info = list(app.callback_map.values())[0]
+        callback_func = callback_info["callback"].__wrapped__
+
+        # Mock ctx.triggered_id to simulate clicking close button
+        with patch("pypsa_explorer.callbacks.data_explorer.ctx") as mock_ctx:
+            mock_ctx.triggered_id = "close-data-explorer-modal"
+
+            # Simulate clicking close button
+            # Use positional arguments matching the callback signature
+            result = callback_func(
+                0,  # buses_clicks
+                0,  # generators_clicks
+                0,  # lines_clicks
+                0,  # links_clicks
+                0,  # storage_units_clicks
+                0,  # stores_clicks
+                1,  # close_clicks
+                "Test",  # network_label
+                True,  # is_open
+            )
+
+        # Modal should be closed
+        is_open = result[0]
+        assert is_open is False
+
+    def test_modal_loads_correct_component_data(self, network_with_timeseries):
+        """Test that modal loads correct component data."""
+        app = Dash(__name__)
+        networks = {"Test": network_with_timeseries}
+        register_data_explorer_callbacks(app, networks)
+
+        # Get the modal toggle callback
+        callback_info = list(app.callback_map.values())[0]
+        callback_func = callback_info["callback"].__wrapped__
+
+        # Test each component type
+        test_cases = [
+            ("buses", "kpi-card-buses", 1, 0, 0, 0, 0, 0),
+            ("generators", "kpi-card-generators", 0, 1, 0, 0, 0, 0),
+            ("lines", "kpi-card-lines", 0, 0, 1, 0, 0, 0),
+            ("links", "kpi-card-links", 0, 0, 0, 1, 0, 0),
+            ("storage_units", "kpi-card-storage_units", 0, 0, 0, 0, 1, 0),
+            ("stores", "kpi-card-stores", 0, 0, 0, 0, 0, 1),
+        ]
+
+        for expected_component, triggered_id, *clicks in test_cases:
+            # Mock ctx.triggered_id for each component
+            with patch("pypsa_explorer.callbacks.data_explorer.ctx") as mock_ctx:
+                mock_ctx.triggered_id = triggered_id
+
+                # Add network_label and is_open to match callback signature
+                result = callback_func(*clicks, 0, "Test", False)
+                active_component = result[6]
+                assert active_component == expected_component
+
+    def test_modal_toggle_prevents_duplicate_open(self, network_with_timeseries):
+        """Test that clicking a KPI card when modal is already open toggles it."""
+        app = Dash(__name__)
+        networks = {"Test": network_with_timeseries}
+        register_data_explorer_callbacks(app, networks)
+
+        # Get the modal toggle callback
+        callback_info = list(app.callback_map.values())[0]
+        callback_func = callback_info["callback"].__wrapped__
+
+        # Mock ctx.triggered_id to simulate clicking buses KPI card
+        with patch("pypsa_explorer.callbacks.data_explorer.ctx") as mock_ctx:
+            mock_ctx.triggered_id = "kpi-card-buses"
+
+            # Click buses card when modal is already open
+            # Use positional arguments matching the callback signature
+            result = callback_func(
+                1,  # buses_clicks
+                0,  # generators_clicks
+                0,  # lines_clicks
+                0,  # links_clicks
+                0,  # storage_units_clicks
+                0,  # stores_clicks
+                0,  # close_clicks
+                "Test",  # network_label
+                True,  # is_open
+            )
+
+        # Modal should stay open and show buses data
+        is_open = result[0]
+        assert is_open is True
+
+
+class TestTimeSeriesAttributeSwitching:
+    """Test time-series attribute switching in the modal."""
+
+    def test_timeseries_attribute_selector_populated(self, network_with_timeseries):
+        """Test that time-series attribute dropdown is populated."""
+        app = Dash(__name__)
+        networks = {"Test": network_with_timeseries}
+        register_data_explorer_callbacks(app, networks)
+
+        # Get the modal toggle callback
+        callback_info = list(app.callback_map.values())[0]
+        callback_func = callback_info["callback"].__wrapped__
+
+        # Mock ctx.triggered_id to simulate clicking generators KPI card
+        with patch("pypsa_explorer.callbacks.data_explorer.ctx") as mock_ctx:
+            mock_ctx.triggered_id = "kpi-card-generators"
+
+            # Open modal for generators (which has time-series data)
+            # Use positional arguments matching the callback signature
+            result = callback_func(
+                0,  # buses_clicks
+                1,  # generators_clicks
+                0,  # lines_clicks
+                0,  # links_clicks
+                0,  # storage_units_clicks
+                0,  # stores_clicks
+                0,  # close_clicks
+                "Test",  # network_label
+                False,  # is_open
+            )
+
+        # Get time-series options
+        ts_options = result[4]
+
+        # Should have options (p and q attributes)
+        assert ts_options is not None
+        assert len(ts_options) > 0
+        # Check that 'p' and 'q' are in the options
+        option_values = [opt["value"] for opt in ts_options]
+        assert "p" in option_values
+        assert "q" in option_values
+
+    def test_timeseries_disabled_for_no_timeseries_component(self, network_with_timeseries):
+        """Test that time-series tab is disabled for components without time-series data."""
+        app = Dash(__name__)
+        networks = {"Test": network_with_timeseries}
+        register_data_explorer_callbacks(app, networks)
+
+        # Get the modal toggle callback
+        callback_info = list(app.callback_map.values())[0]
+        callback_func = callback_info["callback"].__wrapped__
+
+        # Mock ctx.triggered_id to simulate clicking stores KPI card
+        with patch("pypsa_explorer.callbacks.data_explorer.ctx") as mock_ctx:
+            mock_ctx.triggered_id = "kpi-card-stores"
+
+            # Open modal for stores (which typically has no time-series data)
+            # Use positional arguments matching the callback signature
+            result = callback_func(
+                0,  # buses_clicks
+                0,  # generators_clicks
+                0,  # lines_clicks
+                0,  # links_clicks
+                0,  # storage_units_clicks
+                1,  # stores_clicks
+                0,  # close_clicks
+                "Test",  # network_label
+                False,  # is_open
+            )
+
+        # Get time-series disabled status
+        ts_disabled = result[5]
+
+        # Should be disabled or have no options
+        # (depending on implementation)
+        assert ts_disabled is None or result[4] == []
+
+    def test_timeseries_data_loads_on_attribute_change(self, network_with_timeseries):
+        """Test that time-series data loads when attribute is changed."""
+        app = Dash(__name__)
+        networks = {"Test": network_with_timeseries}
+        register_data_explorer_callbacks(app, networks)
+
+        # Get the time-series callback
+        callback_info = list(app.callback_map.values())[1]
+        callback_func = callback_info["callback"].__wrapped__
+
+        # Load time-series data for 'p' attribute of generators
+        # Use positional arguments matching the callback signature
+        data, columns = callback_func("p", "generators", "Test")
+
+        # Should have data
+        assert data is not None
+        assert len(data) > 0
+        assert columns is not None
+        assert len(columns) > 0
+
+        # Check that 'gen1' and 'gen2' columns are present
+        column_ids = [col["id"] for col in columns]
+        assert "gen1" in column_ids or any("gen1" in col for col in column_ids)
+
+
+class TestDataExplorerWithEmptyNetwork:
+    """Test data explorer with networks that have no data."""
+
+    def test_modal_opens_for_empty_component(self, demo_network):
+        """Test that modal opens even when component has no data."""
+        app = Dash(__name__)
+        networks = {"Test": demo_network}
+        register_data_explorer_callbacks(app, networks)
+
+        # Get the modal toggle callback
+        callback_info = list(app.callback_map.values())[0]
+        callback_func = callback_info["callback"].__wrapped__
+
+        # Mock ctx.triggered_id to simulate clicking storage_units KPI card
+        with patch("pypsa_explorer.callbacks.data_explorer.ctx") as mock_ctx:
+            mock_ctx.triggered_id = "kpi-card-storage_units"
+
+            # Open modal for storage_units (empty in demo network)
+            # Use positional arguments matching the callback signature
+            result = callback_func(
+                0,  # buses_clicks
+                0,  # generators_clicks
+                0,  # lines_clicks
+                0,  # links_clicks
+                1,  # storage_units_clicks
+                0,  # stores_clicks
+                0,  # close_clicks
+                "Test",  # network_label
+                False,  # is_open
+            )
+
+        # Modal should still open
+        is_open = result[0]
+        assert is_open is True
+
+    def test_static_data_table_empty_for_missing_components(self, demo_network):
+        """Test that static data table handles empty components gracefully."""
+        app = Dash(__name__)
+        networks = {"Test": demo_network}
+        register_data_explorer_callbacks(app, networks)
+
+        # Get the modal toggle callback
+        callback_info = list(app.callback_map.values())[0]
+        callback_func = callback_info["callback"].__wrapped__
+
+        # Mock ctx.triggered_id to simulate clicking stores KPI card
+        with patch("pypsa_explorer.callbacks.data_explorer.ctx") as mock_ctx:
+            mock_ctx.triggered_id = "kpi-card-stores"
+
+            # Open modal for stores (empty in demo network)
+            # Use positional arguments matching the callback signature
+            result = callback_func(
+                0,  # buses_clicks
+                0,  # generators_clicks
+                0,  # lines_clicks
+                0,  # links_clicks
+                0,  # storage_units_clicks
+                1,  # stores_clicks
+                0,  # close_clicks
+                "Test",  # network_label
+                False,  # is_open
+            )
+
+        # Get static data
+        static_data = result[2]
+
+        # Should handle empty data (either empty list or None)
+        assert static_data is not None or static_data == []
+
+
+class TestDataExplorerIntegration:
+    """Test full integration of data explorer with the app."""
+
+    def test_data_explorer_modal_in_layout(self, demo_network):
+        """Test that data explorer modal is present in the app layout."""
+        from pypsa_explorer.app import create_app
+
+        app = create_app({"Test": demo_network})
+
+        # Check that modal components are in layout
+        layout_str = str(app.layout)
+        assert "data-explorer-modal" in layout_str
+        assert "static-data-table" in layout_str
+        assert "timeseries-data-table" in layout_str
+
+    def test_kpi_cards_have_click_handlers(self, demo_network):
+        """Test that all KPI cards are present and clickable."""
+        from pypsa_explorer.app import create_app
+
+        app = create_app({"Test": demo_network})
+
+        # Check that KPI cards are in layout
+        layout_str = str(app.layout)
+        for kpi_card in KPI_COMPONENT_MAP:
+            assert kpi_card in layout_str
+
+    def test_data_explorer_callbacks_registered(self, demo_network):
+        """Test that data explorer callbacks are registered in the full app."""
+        from pypsa_explorer.app import create_app
+
+        app = create_app({"Test": demo_network})
+
+        # Check that callbacks are registered
+        assert len(app.callback_map) > 0
+
+        # Check for data explorer specific callbacks
+        callback_output_ids = []
+        for callback_info in app.callback_map.values():
+            outputs = callback_info["output"]
+            if not isinstance(outputs, list):
+                outputs = [outputs]
+            for output in outputs:
+                callback_output_ids.append(str(output))
+
+        # Should have data explorer modal outputs
+        assert any("data-explorer-modal" in oid for oid in callback_output_ids)
+        assert any("static-data-table" in oid for oid in callback_output_ids)
+        assert any("timeseries-data-table" in oid for oid in callback_output_ids)

@@ -1416,6 +1416,42 @@ def get_html_template() -> str:
             {{%scripts%}}
             {{%renderer%}}
         </footer>
+        <script>
+            // Keyboard accessibility for KPI cards and ARIA labels
+            document.addEventListener('DOMContentLoaded', function() {{
+                // Add keyboard support for KPI cards
+                const kpiCards = document.querySelectorAll('.kpi-card-clickable[role="button"]');
+                kpiCards.forEach(function(card) {{
+                    card.addEventListener('keydown', function(event) {{
+                        // Trigger click on Enter or Space key
+                        if (event.key === 'Enter' || event.key === ' ') {{
+                            event.preventDefault();
+                            card.click();
+                        }}
+                    }});
+                }});
+
+                // Add aria-label to dark mode toggle and modal close button
+                const observer = new MutationObserver(function(mutations) {{
+                    // Dark mode toggle
+                    const darkModeInput = document.querySelector('#dark-mode-toggle input[type="checkbox"]');
+                    if (darkModeInput && !darkModeInput.hasAttribute('aria-label')) {{
+                        darkModeInput.setAttribute('aria-label', 'Toggle dark mode');
+                    }}
+
+                    // Modal close button
+                    const modalCloseBtn = document.querySelector('#data-explorer-modal .btn-close');
+                    if (modalCloseBtn && !modalCloseBtn.hasAttribute('aria-label')) {{
+                        modalCloseBtn.setAttribute('aria-label', 'Close data explorer modal');
+                    }}
+                }});
+
+                observer.observe(document.body, {{
+                    childList: true,
+                    subtree: true
+                }});
+            }});
+        </script>
     </body>
 </html>
 """
