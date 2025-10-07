@@ -13,23 +13,22 @@ TAB_STYLE = {
 
 TAB_SELECTED_STYLE = {
     "padding": "12px 16px",
-    "backgroundColor": "#f5f7fa",
+    "backgroundColor": "transparent",
     "border": "none",
-    "borderBottom": "3px solid #3498db",
-    "color": "#3498db",
+    "borderBottom": "3px solid transparent",
 }
 
 
 def create_energy_balance_tab() -> dcc.Tab:
     """Create the Energy Balance (timeseries) tab."""
     return dcc.Tab(
-        label="Energy Balance Timeseries",
+        label="📈 Energy Balance Timeseries",
         value="energy-balance",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([html.Div(id="energy-balance-charts-container")]),
+                dbc.CardBody([html.Div(id="energy-balance-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],
@@ -39,13 +38,13 @@ def create_energy_balance_tab() -> dcc.Tab:
 def create_energy_balance_aggregated_tab() -> dcc.Tab:
     """Create the Aggregated Energy Balance tab."""
     return dcc.Tab(
-        label="Energy Balance Totals",
+        label="📊 Energy Balance Totals",
         value="energy-balance-aggregated",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([html.Div(id="agg-energy-balance-charts-container")]),
+                dbc.CardBody([html.Div(id="agg-energy-balance-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],
@@ -55,13 +54,13 @@ def create_energy_balance_aggregated_tab() -> dcc.Tab:
 def create_capacity_tab() -> dcc.Tab:
     """Create the Capacity tab."""
     return dcc.Tab(
-        label="Capacity Totals",
+        label="⚡ Capacity Totals",
         value="capacity",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([dbc.Row(id="capacity-charts-container")]),
+                dbc.CardBody([dbc.Row(id="capacity-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],
@@ -71,13 +70,13 @@ def create_capacity_tab() -> dcc.Tab:
 def create_capex_totals_tab() -> dcc.Tab:
     """Create the CAPEX Totals tab."""
     return dcc.Tab(
-        label="CAPEX Totals",
+        label="💰 CAPEX Totals",
         value="capex",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([dbc.Row(id="capex-charts-container")]),
+                dbc.CardBody([dbc.Row(id="capex-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],
@@ -87,13 +86,13 @@ def create_capex_totals_tab() -> dcc.Tab:
 def create_opex_totals_tab() -> dcc.Tab:
     """Create the OPEX Totals tab."""
     return dcc.Tab(
-        label="OPEX Totals",
+        label="💵 OPEX Totals",
         value="opex",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([dbc.Row(id="opex-charts-container")]),
+                dbc.CardBody([dbc.Row(id="opex-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],
@@ -103,7 +102,7 @@ def create_opex_totals_tab() -> dcc.Tab:
 def create_network_map_tab() -> dcc.Tab:
     """Create the Network Configuration tab with map and metadata."""
     return dcc.Tab(
-        label="Network Configuration",
+        label="🗺️ Network Configuration",
         value="network-config",
         style=TAB_STYLE,
         selected_style=TAB_SELECTED_STYLE,
@@ -139,7 +138,7 @@ def create_network_map_tab() -> dcc.Tab:
                                             style={
                                                 "width": "100%",
                                                 "height": "700px",
-                                                "border": "1px solid #ddd",
+                                                "border": "1px solid #E2E8F0",
                                             },
                                         ),
                                         html.Div(

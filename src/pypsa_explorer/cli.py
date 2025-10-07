@@ -121,8 +121,8 @@ def main(
         f"""[bold cyan]PyPSA Explorer[/bold cyan] [green]v{__version__}[/green]
 
 🌐 Server: [yellow]{host}:{port}[/yellow]
-🐛 Debug Mode: [yellow]{'enabled' if debug else 'disabled'}[/yellow]
-📁 Networks: [yellow]{len(networks_input) if networks_input else 'demo'}[/yellow]
+🐛 Debug Mode: [yellow]{"enabled" if debug else "disabled"}[/yellow]
+📁 Networks: [yellow]{len(networks_input) if networks_input else "demo"}[/yellow]
 
 [dim]Press Ctrl+C to stop the server[/dim]""",
         title="🔌 Starting Dashboard",

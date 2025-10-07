@@ -1,18 +1,65 @@
 """Visualization callbacks for PyPSA Explorer dashboard."""
 
 from collections.abc import Callable
+from typing import Any
 
+import dash
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import pypsa
-from dash import Input, Output, dcc, html
+from dash import Input, Output, ctx, dcc, html
 
+from pypsa_explorer.config import COLORS, COLORS_DARK, PLOTLY_TEMPLATE_NAME, PLOTLY_TEMPLATE_NAME_DARK
 from pypsa_explorer.layouts.components import NO_DATA_MSG, PLEASE_SELECT_CARRIER_MSG, create_error_message
 from pypsa_explorer.utils.helpers import get_carrier_nice_name, get_country_filter
 
 
 def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) -> None:
     """Register visualization-related callbacks."""
+
+    def _compute_bar_chart_height(
+        fig: go.Figure,
+        base_height: int = 240,
+        bar_height: int = 18,
+        min_height: int = 320,
+        max_height: int = 1100,
+    ) -> int:
+        """Estimate a sensible height for horizontal bar charts."""
+
+        axis_categories: dict[str, set[object]] = {}
+
+        for trace in fig.data:
+            if getattr(trace, "type", "") != "bar":
+                continue
+
+            axis_name = getattr(trace, "yaxis", "y") or "y"
+            if axis_name == "y":
+                axis_key = "yaxis"
+            elif isinstance(axis_name, str) and axis_name.startswith("yaxis"):
+                axis_key = axis_name
+            elif isinstance(axis_name, str) and axis_name.startswith("y"):
+                axis_key = f"yaxis{axis_name[1:]}"
+            else:
+                axis_key = "yaxis"
+
+            values = getattr(trace, "y", []) or []
+            try:
+                iterator = list(values)
+            except TypeError:
+                continue
+
+            categories = axis_categories.setdefault(axis_key, set())
+            for value in iterator:
+                if value is None:
+                    continue
+                categories.add(value)
+
+        if not axis_categories:
+            return max(min_height, base_height)
+
+        max_category_count = max(len(categories) for categories in axis_categories.values())
+        estimated_height = base_height + bar_height * max_category_count
+        return max(min_height, min(estimated_height, max_height))
 
     def create_energy_balance_callback(aggregated: bool = False) -> Callable:
         """
@@ -34,9 +81,15 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             country_mode: str,
             selected_countries: list[str],
             selected_network_label: str,
+            is_dark_mode: bool,
         ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
             n = networks[selected_network_label]
             s = n.statistics
+
+            # Select colors and template based on dark mode
+            colors = COLORS_DARK if is_dark_mode else COLORS
+            bg_color = colors["background"]
+            template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
 
             if not selected_carriers:
                 return [PLEASE_SELECT_CARRIER_MSG] if aggregated else PLEASE_SELECT_CARRIER_MSG
@@ -80,8 +133,9 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                         fig.update_layout(
                             legend_title="Component Carrier",
                             hovermode="closest",
-                            paper_bgcolor="#f5f7fa",
-                            plot_bgcolor="#f5f7fa",
+                            paper_bgcolor=bg_color,
+                            plot_bgcolor=bg_color,
+                            template=template,
                         )
 
                     # Common title setting
@@ -92,9 +146,29 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                         countries_str = ", ".join(selected_countries)
                         title += f" (Countries: {countries_str})"
 
-                    fig.update_layout(title=title, paper_bgcolor="#f5f7fa", plot_bgcolor="#f5f7fa")
+                    # Apply robust height settings to prevent resizing
+                    height = 500
+                    layout_kwargs: dict[str, Any] = {
+                        "title": title,
+                        "paper_bgcolor": bg_color,
+                        "plot_bgcolor": bg_color,
+                        "template": template,
+                    }
+                    if aggregated:
+                        height = _compute_bar_chart_height(fig)
+                        layout_kwargs["margin"] = {"l": 160, "r": 60, "t": 80, "b": 60}
+                        layout_kwargs["showlegend"] = False
+                        layout_kwargs["height"] = height
+                    else:
+                        layout_kwargs["height"] = height
 
-                    graph_component = dcc.Graph(figure=fig)
+                    fig.update_layout(**layout_kwargs)
+                    if aggregated:
+                        fig.update_yaxes(title_text="")
+
+                    # Add explicit height constraint to prevent growth
+                    graph_style = {"height": f"{height}px"}
+                    graph_component = dcc.Graph(figure=fig, style=graph_style, className="mb-4")
                     charts.append(graph_component)
 
                 except Exception as e:
@@ -118,16 +192,25 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_energy_balance(
         selected_carriers: list[str],
         country_mode: str,
         selected_countries: list[str],
         selected_network_label: str,
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "energy-balance" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         return create_energy_balance_callback(aggregated=False)(
-            selected_carriers, country_mode, selected_countries, selected_network_label
+            selected_carriers, country_mode, selected_countries, selected_network_label, is_dark_mode
         )
 
     # Callback for Aggregated Energy Balance charts
@@ -138,16 +221,25 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_energy_balance_aggregated(
         selected_carriers: list[str],
         country_mode: str,
         selected_countries: list[str],
         selected_network_label: str,
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "energy-balance-aggregated" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         return create_energy_balance_callback(aggregated=True)(
-            selected_carriers, country_mode, selected_countries, selected_network_label
+            selected_carriers, country_mode, selected_countries, selected_network_label, is_dark_mode
         )
 
     # Callback for Capacity charts
@@ -158,16 +250,30 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_capacity_charts(
         selected_carriers: list[str],
         country_mode: str,
         selected_countries: list[str],
         selected_network_label: str,
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dcc.Graph | html.Div]:
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "capacity" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         n = networks[selected_network_label]
         s = n.statistics
+
+        # Select colors and template based on dark mode
+        colors = COLORS_DARK if is_dark_mode else COLORS
+        bg_color = colors["background"]
+        template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
 
         if not selected_carriers:
             return [PLEASE_SELECT_CARRIER_MSG]
@@ -201,10 +307,28 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                     countries_str = ", ".join(selected_countries)
                     title += f" (Countries: {countries_str})"
 
-                fig.update_layout(title=title, paper_bgcolor="#f5f7fa", plot_bgcolor="#f5f7fa")
+                height = _compute_bar_chart_height(fig)
+                fig.update_layout(
+                    title=title,
+                    paper_bgcolor=bg_color,
+                    plot_bgcolor=bg_color,
+                    template=template,
+                    height=height,
+                    margin={"l": 160, "r": 60, "t": 80, "b": 60},
+                    showlegend=False,
+                )
+
+                # Remove redundant carrier axis title and keep consistent height
+                fig.update_yaxes(title_text="")
 
                 # Add the graph without wrapping in dbc.Col so it takes full width
-                charts.append(dcc.Graph(figure=fig, className="mb-4"))
+                charts.append(
+                    dcc.Graph(
+                        figure=fig,
+                        className="mb-4",
+                        style={"height": f"{height}px"},
+                    )
+                )
 
             except Exception as e:
                 message = create_error_message(f"carrier '{carrier}'", e)
@@ -223,13 +347,29 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_capex_charts(
-        country_mode: str, selected_countries: list[str], selected_network_label: str
+        country_mode: str,
+        selected_countries: list[str],
+        selected_network_label: str,
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dcc.Graph | html.Div]:
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "capex" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         n = networks[selected_network_label]
         s = n.statistics
+
+        # Select colors and template based on dark mode
+        colors = COLORS_DARK if is_dark_mode else COLORS
+        bg_color = colors["background"]
+        template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
 
         # Use helper for country filtering
         query, facet_col, error_message = get_country_filter(country_mode, selected_countries)
@@ -255,21 +395,24 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                 countries_str = ", ".join(selected_countries)
                 title += f" (Countries: {countries_str})"
 
-            # Apply robust height settings to prevent resizing
+            height = _compute_bar_chart_height(fig, base_height=260, bar_height=40, min_height=360, max_height=1200)
             fig.update_layout(
                 title=title,
-                height=1000,
-                margin={"l": 50, "r": 50, "t": 100, "b": 50},
-                paper_bgcolor="#f5f7fa",
-                plot_bgcolor="#f5f7fa",
+                height=height,
+                margin={"l": 160, "r": 60, "t": 100, "b": 60},
+                paper_bgcolor=bg_color,
+                plot_bgcolor=bg_color,
+                template=template,
+                showlegend=False,
             )
+            fig.update_yaxes(title_text="")
 
             # Return the graph with explicit height in component
             return [
                 dcc.Graph(
                     figure=fig,
                     className="mb-4",
-                    style={"height": "1000px"},
+                    style={"height": f"{height}px"},
                 )
             ]
 
@@ -284,13 +427,29 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
             Input("global-country-mode", "value"),
             Input("global-country-selector", "value"),
             Input("network-selector", "value"),
+            Input("tabs", "value"),
+            Input("dark-mode-store", "data"),
         ],
+        prevent_initial_call=True,
     )
     def update_opex_charts(
-        country_mode: str, selected_countries: list[str], selected_network_label: str
+        country_mode: str,
+        selected_countries: list[str],
+        selected_network_label: str,
+        active_tab: str,
+        is_dark_mode: bool,
     ) -> list[dcc.Graph | html.Div]:
+        # Only render if this tab is active OR if tab just became active
+        if active_tab != "opex" and ctx.triggered_id != "tabs":
+            return dash.no_update
+
         n = networks[selected_network_label]
         s = n.statistics
+
+        # Select colors and template based on dark mode
+        colors = COLORS_DARK if is_dark_mode else COLORS
+        bg_color = colors["background"]
+        template = PLOTLY_TEMPLATE_NAME_DARK if is_dark_mode else PLOTLY_TEMPLATE_NAME
 
         # Use helper for country filtering
         query, facet_col, error_message = get_country_filter(country_mode, selected_countries)
@@ -316,21 +475,24 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
                 countries_str = ", ".join(selected_countries)
                 title += f" (Countries: {countries_str})"
 
-            # Apply robust height settings to prevent resizing
+            height = _compute_bar_chart_height(fig, base_height=260, bar_height=40, min_height=360, max_height=1200)
             fig.update_layout(
                 title=title,
-                height=1000,
-                margin={"l": 50, "r": 50, "t": 100, "b": 50},
-                paper_bgcolor="#f5f7fa",
-                plot_bgcolor="#f5f7fa",
+                height=height,
+                margin={"l": 160, "r": 60, "t": 100, "b": 60},
+                paper_bgcolor=bg_color,
+                plot_bgcolor=bg_color,
+                template=template,
+                showlegend=False,
             )
+            fig.update_yaxes(title_text="")
 
             # Return the graph with explicit height in component
             return [
                 dcc.Graph(
                     figure=fig,
                     className="mb-4",
-                    style={"height": "1000px"},
+                    style={"height": f"{height}px"},
                 )
             ]
 

@@ -30,22 +30,73 @@ def create_welcome_page(network_labels: list[str], networks_info: dict[str, dict
                         style={
                             "height": "60px",
                             "position": "absolute",
-                            "top": "15px",
-                            "right": "15px",
+                            "top": "35px",
+                            "right": "35px",
+                            "zIndex": "10",
                         },
                     ),
                 ),
+                # Hero Section
                 html.Div(
                     [
+                        html.Div(
+                            "⚡",
+                            style={
+                                "fontSize": "5rem",
+                                "marginBottom": "20px",
+                                "display": "inline-block",
+                                "animation": "pulse 2s ease-in-out infinite",
+                            },
+                        ),
                         html.H1(
-                            "Welcome to the Energy System Dashboard",
+                            "PyPSA Energy Explorer",
                             className="welcome-header",
                         ),
                         html.P(
-                            "Explore energy systems with interactive visualizations.",
+                            "Analyze and visualize power system networks with interactive, real-time insights",
                             className="welcome-subtitle",
                         ),
-                        html.Hr(className="my-4"),
+                        html.Div(
+                            [
+                                html.Span(
+                                    "🔋 Advanced Analytics",
+                                    style={
+                                        "display": "inline-block",
+                                        "margin": "0 15px",
+                                        "padding": "8px 16px",
+                                        "background": "rgba(255, 255, 255, 0.9)",
+                                        "borderRadius": "20px",
+                                        "fontSize": "0.9rem",
+                                        "fontWeight": "500",
+                                    },
+                                ),
+                                html.Span(
+                                    "📊 Interactive Visualizations",
+                                    style={
+                                        "display": "inline-block",
+                                        "margin": "0 15px",
+                                        "padding": "8px 16px",
+                                        "background": "rgba(255, 255, 255, 0.9)",
+                                        "borderRadius": "20px",
+                                        "fontSize": "0.9rem",
+                                        "fontWeight": "500",
+                                    },
+                                ),
+                                html.Span(
+                                    "🌍 Multi-Network Support",
+                                    style={
+                                        "display": "inline-block",
+                                        "margin": "0 15px",
+                                        "padding": "8px 16px",
+                                        "background": "rgba(255, 255, 255, 0.9)",
+                                        "borderRadius": "20px",
+                                        "fontSize": "0.9rem",
+                                        "fontWeight": "500",
+                                    },
+                                ),
+                            ],
+                            style={"marginTop": "30px", "marginBottom": "20px"},
+                        ),
                     ],
                     className="welcome-card mb-4",
                 ),
@@ -178,11 +229,23 @@ def create_welcome_page(network_labels: list[str], networks_info: dict[str, dict
                         html.Div(
                             [
                                 dbc.Button(
-                                    "Enter Dashboard",
+                                    [
+                                        html.I(className="fas fa-rocket", style={"marginRight": "10px"}),
+                                        "Enter Dashboard",
+                                    ],
                                     id="enter-dashboard-btn",
-                                    color="primary",
                                     size="lg",
                                     className="mt-4",
+                                    style={
+                                        "background": "linear-gradient(135deg, #0066CC 0%, #4ECDC4 100%)",
+                                        "border": "none",
+                                        "padding": "16px 48px",
+                                        "fontSize": "1.1rem",
+                                        "fontWeight": "600",
+                                        "borderRadius": "50px",
+                                        "boxShadow": "0 8px 24px rgba(0, 102, 204, 0.3)",
+                                        "transition": "all 0.3s ease",
+                                    },
                                 )
                             ],
                             className="text-center mt-4 mb-5",
