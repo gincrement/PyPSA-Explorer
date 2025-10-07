@@ -103,31 +103,64 @@ def create_dark_mode_toggle() -> html.Div:
     )
 
 
-def create_utility_bar(active_network_label: str, network_count: int) -> html.Div:
-    """Create a top utility bar with global controls."""
+def create_top_bar(network_labels: list[str], active_network_label: str) -> html.Div:
+    """Create the primary top bar with branding, network selection, and display controls."""
+
+    network_count = len(network_labels)
 
     return html.Div(
         [
             html.Div(
                 [
-                    html.Span("Active network", className="utility-label"),
+                    html.H1("⚡ PyPSA Explorer", className="utility-brand__title"),
                     html.Span(
-                        active_network_label,
-                        className="utility-badge",
-                    ),
-                    html.Span(
-                        f"{network_count} loaded" if network_count != 1 else "1 loaded",
-                        className="utility-meta text-muted",
+                        "Energy System Analysis & Visualization",
+                        className="utility-brand__subtitle",
                     ),
                 ],
-                className="utility-bar__meta",
+                className="utility-bar__brand",
             ),
             html.Div(
                 [
-                    html.Span("Display", className="utility-label d-none d-md-inline"),
-                    create_dark_mode_toggle(),
+                    html.Div(
+                        [
+                            html.Span("Active network", className="utility-label"),
+                            html.Span(
+                                active_network_label,
+                                id="top-bar-active-network",
+                                className="utility-badge",
+                            ),
+                            html.Span(
+                                f"{network_count} loaded" if network_count != 1 else "1 loaded",
+                                className="utility-meta text-muted",
+                            ),
+                        ],
+                        className="utility-bar__meta",
+                    ),
+                    html.Div(
+                        [
+                            html.Span("Network", className="utility-label d-none d-md-inline"),
+                            dcc.Dropdown(
+                                id="network-selector",
+                                options=[{"label": label, "value": label} for label in network_labels],  # type: ignore[arg-type]
+                                value=active_network_label,
+                                clearable=False,
+                                className="network-selector",
+                            ),
+                        ],
+                        id="top-bar-network-selector",
+                        className="top-bar__selector",
+                        style={"display": "none"},
+                    ),
+                    html.Div(
+                        [
+                            html.Span("Display", className="utility-label d-none d-md-inline"),
+                            create_dark_mode_toggle(),
+                        ],
+                        className="utility-bar__controls",
+                    ),
                 ],
-                className="utility-bar__controls",
+                className="utility-bar__actions",
             ),
         ],
         className="utility-bar",
@@ -163,25 +196,9 @@ def create_error_message(context: str, error: Exception) -> html.Div:
     )
 
 
-def create_header(n: pypsa.Network, network_labels: list[str], active_network_label: str) -> html.Div:
-    """
-    Create the header section with network selector and KPI cards.
+def create_header(n: pypsa.Network) -> html.Div:
+    """Create the KPI section for the active network."""
 
-    Parameters
-    ----------
-    n : pypsa.Network
-        The active PyPSA network object
-    network_labels : list[str]
-        List of available network labels
-    active_network_label : str
-        Label of the currently active network
-
-    Returns
-    -------
-    html.Div
-        Header component with gradient background, network selector, and KPI cards
-    """
-    # Calculate KPIs
     total_buses = len(n.buses)
     total_generators = len(n.generators) if hasattr(n, "generators") else 0
     total_lines = len(n.lines) if hasattr(n, "lines") else 0
@@ -191,58 +208,12 @@ def create_header(n: pypsa.Network, network_labels: list[str], active_network_la
 
     return html.Div(
         [
-            # Gradient Header Bar
-            html.Div(
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.H1(
-                                    "⚡ PyPSA Explorer",
-                                    style={"margin": 0, "color": "white", "fontSize": "2rem", "fontWeight": "700"},
-                                ),
-                                html.P(
-                                    "Energy System Analysis & Visualization",
-                                    style={
-                                        "margin": "4px 0 0 0",
-                                        "color": "rgba(255, 255, 255, 0.9)",
-                                        "fontSize": "0.95rem",
-                                    },
-                                ),
-                            ],
-                            width=6,
-                        ),
-                        dbc.Col(
-                            [
-                                html.Label(
-                                    "Network:",
-                                    style={"color": "white", "fontWeight": "600", "marginBottom": "8px"},
-                                ),
-                                dcc.Dropdown(
-                                    id="network-selector",
-                                    options=[{"label": label, "value": label} for label in network_labels],  # type: ignore[arg-type]
-                                    value=active_network_label,
-                                    clearable=False,
-                                    className="network-selector",
-                                ),
-                            ],
-                            width=6,
-                        ),
-                    ],
-                    align="center",
-                ),
-                className="app-header",
-            ),
-            # KPI Cards
             dbc.Row(
                 [
                     dbc.Col(
                         html.Div(
                             [
-                                html.Div(
-                                    [html.I(className="fas fa-circle-nodes")],
-                                    className="kpi-icon",
-                                ),
+                                html.Div([html.I(className="fas fa-circle-nodes")], className="kpi-icon"),
                                 html.Div(str(total_buses), className="kpi-value"),
                                 html.Div("Nodes", className="kpi-label"),
                             ],
@@ -258,10 +229,7 @@ def create_header(n: pypsa.Network, network_labels: list[str], active_network_la
                     dbc.Col(
                         html.Div(
                             [
-                                html.Div(
-                                    [html.I(className="fas fa-bolt")],
-                                    className="kpi-icon",
-                                ),
+                                html.Div([html.I(className="fas fa-bolt")], className="kpi-icon"),
                                 html.Div(str(total_generators), className="kpi-value"),
                                 html.Div("Generators", className="kpi-label"),
                             ],
@@ -277,10 +245,7 @@ def create_header(n: pypsa.Network, network_labels: list[str], active_network_la
                     dbc.Col(
                         html.Div(
                             [
-                                html.Div(
-                                    [html.I(className="fas fa-bezier-curve")],
-                                    className="kpi-icon",
-                                ),
+                                html.Div([html.I(className="fas fa-bezier-curve")], className="kpi-icon"),
                                 html.Div(str(total_lines), className="kpi-value"),
                                 html.Div("Lines", className="kpi-label"),
                             ],
@@ -296,10 +261,7 @@ def create_header(n: pypsa.Network, network_labels: list[str], active_network_la
                     dbc.Col(
                         html.Div(
                             [
-                                html.Div(
-                                    [html.I(className="fas fa-link")],
-                                    className="kpi-icon",
-                                ),
+                                html.Div([html.I(className="fas fa-link")], className="kpi-icon"),
                                 html.Div(str(total_links), className="kpi-value"),
                                 html.Div("Links", className="kpi-label"),
                             ],
@@ -315,10 +277,7 @@ def create_header(n: pypsa.Network, network_labels: list[str], active_network_la
                     dbc.Col(
                         html.Div(
                             [
-                                html.Div(
-                                    [html.I(className="fas fa-battery-three-quarters")],
-                                    className="kpi-icon",
-                                ),
+                                html.Div([html.I(className="fas fa-battery-three-quarters")], className="kpi-icon"),
                                 html.Div(str(total_storage_units), className="kpi-value"),
                                 html.Div("Storage Units", className="kpi-label"),
                             ],
@@ -334,10 +293,7 @@ def create_header(n: pypsa.Network, network_labels: list[str], active_network_la
                     dbc.Col(
                         html.Div(
                             [
-                                html.Div(
-                                    [html.I(className="fas fa-warehouse")],
-                                    className="kpi-icon",
-                                ),
+                                html.Div([html.I(className="fas fa-warehouse")], className="kpi-icon"),
                                 html.Div(str(total_stores), className="kpi-value"),
                                 html.Div("Stores", className="kpi-label"),
                             ],
@@ -351,10 +307,10 @@ def create_header(n: pypsa.Network, network_labels: list[str], active_network_la
                         lg=2,
                     ),
                 ],
-                className="mb-4",
-                style={"marginTop": "24px"},
-            ),
-        ]
+                className="g-3",
+            )
+        ],
+        className="app-header",
     )
 
 

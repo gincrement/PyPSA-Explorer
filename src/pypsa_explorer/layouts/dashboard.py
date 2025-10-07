@@ -10,7 +10,7 @@ from pypsa_explorer.layouts.components import (
     create_footer,
     create_header,
     create_sidebar_filter_panel,
-    create_utility_bar,
+    create_top_bar,
 )
 from pypsa_explorer.layouts.tabs import (
     create_capacity_tab,
@@ -69,7 +69,7 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
                 id="app-container",
                 className="",
                 children=[
-                    create_utility_bar(active_network_label, len(network_labels)),
+                    create_top_bar(network_labels, active_network_label),
                     html.Div(
                         id="main-content",
                         className="fade-in",
@@ -84,7 +84,7 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
                                 id="dashboard-content",
                                 style={"display": "none"},
                                 children=[
-                                    create_header(n, network_labels, active_network_label),
+                                    create_header(n),
                                     # Main content with sidebar layout
                                     dbc.Row(
                                         [
@@ -100,16 +100,16 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
                                             ),
                                             # Main content area
                                             dbc.Col(
-                                            dcc.Tabs(
-                                                id="tabs",
-                                                style={
-                                                    "borderBottom": "2px solid transparent",
-                                                    "marginBottom": "20px",
-                                                },
-                                                parent_style={
-                                                    "borderRadius": "16px",
-                                                    "overflow": "hidden",
-                                                },
+                                                dcc.Tabs(
+                                                    id="tabs",
+                                                    style={
+                                                        "borderBottom": "2px solid transparent",
+                                                        "marginBottom": "20px",
+                                                    },
+                                                    parent_style={
+                                                        "borderRadius": "16px",
+                                                        "overflow": "hidden",
+                                                    },
                                                     children=[
                                                         create_energy_balance_tab(),
                                                         create_energy_balance_aggregated_tab(),

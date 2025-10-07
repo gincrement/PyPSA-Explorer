@@ -34,6 +34,15 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network]) -> None:
         return updated_bus_carrier_options, updated_country_options
 
     @app.callback(
+        Output("top-bar-active-network", "children"),
+        [Input("network-selector", "value")],
+    )
+    def update_active_network_badge(selected_network_label: str) -> str:
+        """Reflect the currently selected network in the top bar badge."""
+
+        return selected_network_label
+
+    @app.callback(
         Output("network-map", "srcDoc"),
         [
             Input("refresh-map-button", "n_clicks"),

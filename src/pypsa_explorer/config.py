@@ -171,13 +171,40 @@ body {
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 16px;
-    padding: 8px 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 16px;
-    box-shadow: var(--shadow-md);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(30, 64, 175, 0.22);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.utility-bar__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.utility-brand__title {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: inherit;
+}
+
+.utility-brand__subtitle {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.utility-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .utility-bar__meta,
@@ -188,10 +215,23 @@ body {
     flex-wrap: wrap;
 }
 
+.top-bar__selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 300px;
+    flex: 1 1 300px;
+}
+.network-selector {
+    width: 100%;
+    min-width: 260px;
+    max-width: 360px;
+}
+
 .utility-label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--light-text);
+    color: rgba(255, 255, 255, 0.78);
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
@@ -201,13 +241,15 @@ body {
     align-items: center;
     padding: 6px 14px;
     border-radius: 999px;
-    background: rgba(102, 126, 234, 0.12);
-    color: #323f74;
+    background: rgba(255, 255, 255, 0.18);
+    color: #FFFFFF;
     font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 .utility-meta {
     font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.72) !important;
 }
 
 .dark-mode-toggle {
@@ -215,11 +257,12 @@ body {
     align-items: center;
     gap: 10px;
     padding: 8px 14px;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 999px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.28);
     box-shadow: var(--shadow-sm);
     transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+    color: #FFFFFF;
 }
 
 #dark-mode-toggle-container .form-check {
@@ -236,6 +279,24 @@ body {
         align-items: stretch;
         gap: 16px;
         padding: 12px 16px;
+    }
+
+    .utility-bar__actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .top-bar__selector {
+        min-width: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .network-selector {
+        min-width: 0;
+        max-width: 100%;
     }
 
     .utility-bar__controls {
@@ -803,16 +864,17 @@ footer {
 
 /* ===== HEADER & NAVIGATION ===== */
 .app-header {
-    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    background: rgba(255, 255, 255, 0.95);
     padding: 20px 32px;
     border-radius: 20px;
     margin-bottom: 32px;
     box-shadow: var(--shadow-lg);
-    color: white;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    color: var(--text-color);
 }
 
 .app-header h1 {
-    color: white;
+    color: var(--text-color);
     margin: 0;
     font-size: 2rem;
     font-weight: 700;
@@ -872,30 +934,6 @@ footer {
     box-shadow: var(--shadow-md);
 }
 
-.kpi-card:nth-child(1) {
-    border-left-color: #667EEA;
-}
-
-.kpi-card:nth-child(2) {
-    border-left-color: #4ECDC4;
-}
-
-.kpi-card:nth-child(3) {
-    border-left-color: #FF6B6B;
-}
-
-.kpi-card:nth-child(4) {
-    border-left-color: #FFB84D;
-}
-
-.kpi-card:nth-child(5) {
-    border-left-color: #A78BFA;
-}
-
-.kpi-card:nth-child(6) {
-    border-left-color: #34D399;
-}
-
 .kpi-value {
     font-size: 1.5rem;
     font-weight: 700;
@@ -922,30 +960,7 @@ footer {
     position: relative;
     z-index: 1;
     margin-bottom: 2px;
-}
-
-.kpi-card:nth-child(1) .kpi-icon {
-    color: #667EEA;
-}
-
-.kpi-card:nth-child(2) .kpi-icon {
-    color: #4ECDC4;
-}
-
-.kpi-card:nth-child(3) .kpi-icon {
-    color: #FF6B6B;
-}
-
-.kpi-card:nth-child(4) .kpi-icon {
-    color: #FFB84D;
-}
-
-.kpi-card:nth-child(5) .kpi-icon {
-    color: #A78BFA;
-}
-
-.kpi-card:nth-child(6) .kpi-icon {
-    color: #34D399;
+    color: var(--accent-color);
 }
 
 /* ===== LOADING STATES ===== */
@@ -1029,35 +1044,45 @@ footer {
 }
 
 .dark-mode .utility-bar {
-    background: rgba(26, 31, 54, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 14px 32px rgba(15, 20, 25, 0.45);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.35) 0%, rgba(78, 205, 196, 0.25) 100%);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 18px 42px rgba(8, 12, 24, 0.6);
 }
 
 .dark-mode .utility-label {
-    color: #94A3B8;
+    color: rgba(241, 245, 249, 0.85);
+}
+
+.dark-mode .utility-brand__title {
+    color: #F8FAFC;
+}
+
+.dark-mode .utility-brand__subtitle {
+    color: rgba(241, 245, 249, 0.75);
 }
 
 .dark-mode .utility-badge {
-    background: rgba(78, 205, 196, 0.2);
-    color: #E6FFFA;
+    background: rgba(15, 23, 42, 0.35);
+    color: #F8FAFC;
+    border-color: rgba(148, 163, 184, 0.45);
 }
 
 .dark-mode .utility-meta {
-    color: #94A3B8 !important;
+    color: rgba(226, 232, 240, 0.82) !important;
 }
 
 .dark-mode .dark-mode-toggle {
-    background: rgba(26, 31, 54, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 24px rgba(15, 20, 25, 0.45);
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    box-shadow: 0 12px 26px rgba(8, 12, 24, 0.55);
     color: #E2E8F0;
 }
 
 .dark-mode .app-header {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.35) 0%, rgba(78, 205, 196, 0.25) 100%);
+    background: rgba(26, 31, 54, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 18px 40px rgba(15, 20, 25, 0.55);
+    color: #E2E8F0;
 }
 
 .dark-mode .app-header h1,
