@@ -103,17 +103,16 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
 
                     # Apply robust height settings to prevent resizing
                     height = 500 if not aggregated else None
+                    layout_kwargs = {
+                        "title": title,
+                        "paper_bgcolor": bg_color,
+                        "plot_bgcolor": bg_color,
+                        "template": template,
+                    }
                     if height:
-                        fig.update_layout(
-                            title=title,
-                            paper_bgcolor=bg_color,
-                            plot_bgcolor=bg_color,
-                            template=template,
-                            height=height,
-                            margin={"l": 50, "r": 50, "t": 100, "b": 50},
-                        )
+                        fig.update_layout(height=height, **layout_kwargs)
                     else:
-                        fig.update_layout(title=title, paper_bgcolor=bg_color, plot_bgcolor=bg_color, template=template)
+                        fig.update_layout(**layout_kwargs)
 
                     # Add explicit height constraint to prevent growth
                     graph_style = {"height": f"{height}px"} if height else {}

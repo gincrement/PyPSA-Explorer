@@ -28,7 +28,7 @@ def create_energy_balance_tab() -> dcc.Tab:
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([html.Div(id="energy-balance-charts-container")]),
+                dbc.CardBody([html.Div(id="energy-balance-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],
@@ -44,7 +44,7 @@ def create_energy_balance_aggregated_tab() -> dcc.Tab:
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([html.Div(id="agg-energy-balance-charts-container")]),
+                dbc.CardBody([html.Div(id="agg-energy-balance-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],
@@ -60,7 +60,7 @@ def create_capacity_tab() -> dcc.Tab:
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([dbc.Row(id="capacity-charts-container")]),
+                dbc.CardBody([dbc.Row(id="capacity-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],
@@ -76,7 +76,7 @@ def create_capex_totals_tab() -> dcc.Tab:
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([dbc.Row(id="capex-charts-container")]),
+                dbc.CardBody([dbc.Row(id="capex-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],
@@ -92,7 +92,7 @@ def create_opex_totals_tab() -> dcc.Tab:
         selected_style=TAB_SELECTED_STYLE,
         children=[
             dbc.Card(
-                dbc.CardBody([dbc.Row(id="opex-charts-container")]),
+                dbc.CardBody([dbc.Row(id="opex-charts-container")], className="chart-card-body"),
                 className="mt-3",
             )
         ],

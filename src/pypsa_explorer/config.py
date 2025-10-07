@@ -885,10 +885,14 @@ footer {
 #capacity-charts-container,
 #capex-charts-container,
 #opex-charts-container {
-    padding: 20px;
+    padding: 12px 16px;
     background: rgba(255, 255, 255, 0.6);
     border-radius: 16px;
     backdrop-filter: blur(10px);
+}
+
+.chart-card-body {
+    padding: 0;
 }
 
 /* Add subtle section headers */
