@@ -343,6 +343,28 @@ h5 { font-size: 1.1rem; font-weight: 600; }
     padding: 24px;
 }
 
+/* Empty state panels */
+.empty-state {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    border: 2px dashed rgba(78, 205, 196, 0.35);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: border-color var(--transition-base), background var(--transition-base);
+}
+
+.empty-state--warning {
+    border-color: rgba(255, 184, 77, 0.45);
+}
+
+.empty-state:hover {
+    border-color: rgba(78, 205, 196, 0.55);
+}
+
+.empty-state--warning:hover {
+    border-color: rgba(255, 184, 77, 0.65);
+}
+
 .tab-content {
     background-color: transparent !important;
     border: none !important;
@@ -738,6 +760,33 @@ h5 { font-size: 1.1rem; font-weight: 600; }
 .Select-value-icon:hover {
     background-color: rgba(0, 0, 0, 0.1);
     color: white;
+}
+
+.Select-placeholder {
+    color: var(--light-text);
+    opacity: 0.9;
+}
+
+.Select-menu-outer {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.Select-option {
+    color: var(--text-color);
+}
+
+.Select-option.is-focused,
+.Select-option.is-selected {
+    background: rgba(78, 205, 196, 0.12);
+    color: var(--text-color);
+}
+
+.Select-arrow {
+    border-color: rgba(0, 0, 0, 0.45) transparent transparent;
 }
 
 /* ===== ANIMATIONS ===== */
@@ -1159,6 +1208,50 @@ footer {
 
 .dark-mode .Select-control:hover {
     border-color: #4ECDC4;
+}
+
+.dark-mode .Select-placeholder,
+.dark-mode .Select-value-label,
+.dark-mode .Select-value-icon {
+    color: #E2E8F0 !important;
+}
+
+.dark-mode .Select-menu-outer {
+    background: rgba(15, 23, 42, 0.94);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 14px 32px rgba(8, 12, 24, 0.6);
+}
+
+.dark-mode .Select-option {
+    color: #E2E8F0;
+}
+
+.dark-mode .Select-option.is-focused,
+.dark-mode .Select-option.is-selected {
+    background: rgba(78, 205, 196, 0.22);
+    color: #0F172A;
+}
+
+.dark-mode .Select-arrow {
+    border-color: rgba(226, 232, 240, 0.7) transparent transparent;
+}
+
+.dark-mode .empty-state {
+    background: rgba(26, 31, 54, 0.92);
+    border-color: rgba(78, 205, 196, 0.38);
+    box-shadow: 0 12px 28px rgba(8, 12, 24, 0.45);
+}
+
+.dark-mode .empty-state:hover {
+    border-color: rgba(78, 205, 196, 0.52);
+}
+
+.dark-mode .empty-state--warning {
+    border-color: rgba(255, 184, 77, 0.55);
+}
+
+.dark-mode .empty-state--warning:hover {
+    border-color: rgba(255, 184, 77, 0.7);
 }
 
 .dark-mode .kpi-card {

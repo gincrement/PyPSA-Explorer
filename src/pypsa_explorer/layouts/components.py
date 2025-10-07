@@ -21,12 +21,7 @@ PLEASE_SELECT_CARRIER_MSG = html.Div(
             style={"fontSize": "1rem"},
         ),
     ],
-    className="text-center my-5 p-5",
-    style={
-        "background": "rgba(255, 255, 255, 0.8)",
-        "borderRadius": "16px",
-        "border": "2px dashed rgba(78, 205, 196, 0.3)",
-    },
+    className="text-center my-5 p-5 empty-state",
 )
 
 PLEASE_SELECT_COUNTRY_MSG = html.Div(
@@ -41,12 +36,7 @@ PLEASE_SELECT_COUNTRY_MSG = html.Div(
             style={"fontSize": "1rem"},
         ),
     ],
-    className="text-center my-5 p-5",
-    style={
-        "background": "rgba(255, 255, 255, 0.8)",
-        "borderRadius": "16px",
-        "border": "2px dashed rgba(78, 205, 196, 0.3)",
-    },
+    className="text-center my-5 p-5 empty-state",
 )
 
 NO_DATA_MSG = html.Div(
@@ -66,12 +56,7 @@ NO_DATA_MSG = html.Div(
             style={"fontSize": "1rem"},
         ),
     ],
-    className="text-center my-5 p-5",
-    style={
-        "background": "rgba(255, 255, 255, 0.8)",
-        "borderRadius": "16px",
-        "border": "2px dashed rgba(255, 184, 77, 0.3)",
-    },
+    className="text-center my-5 p-5 empty-state empty-state--warning",
 )
 
 
@@ -106,8 +91,6 @@ def create_dark_mode_toggle() -> html.Div:
 def create_top_bar(network_labels: list[str], active_network_label: str) -> html.Div:
     """Create the primary top bar with branding, network selection, and display controls."""
 
-    network_count = len(network_labels)
-
     return html.Div(
         [
             html.Div(
@@ -122,21 +105,6 @@ def create_top_bar(network_labels: list[str], active_network_label: str) -> html
             ),
             html.Div(
                 [
-                    html.Div(
-                        [
-                            html.Span("Active network", className="utility-label"),
-                            html.Span(
-                                active_network_label,
-                                id="top-bar-active-network",
-                                className="utility-badge",
-                            ),
-                            html.Span(
-                                f"{network_count} loaded" if network_count != 1 else "1 loaded",
-                                className="utility-meta text-muted",
-                            ),
-                        ],
-                        className="utility-bar__meta",
-                    ),
                     html.Div(
                         [
                             html.Span("Network", className="utility-label d-none d-md-inline"),
@@ -154,7 +122,6 @@ def create_top_bar(network_labels: list[str], active_network_label: str) -> html
                     ),
                     html.Div(
                         [
-                            html.Span("Display", className="utility-label d-none d-md-inline"),
                             create_dark_mode_toggle(),
                         ],
                         className="utility-bar__controls",
