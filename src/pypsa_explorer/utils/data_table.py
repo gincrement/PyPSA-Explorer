@@ -23,7 +23,11 @@ def dataframe_to_datatable(df: pd.DataFrame, max_rows: int = 5000) -> tuple[list
     tuple[list[dict], list[dict]]
         (data, columns) - Data as list of dicts, columns as list of column definitions
     """
+    # Reset index and handle NaN values
     df_reset = df.reset_index()
+
+    # Replace NaN values with empty strings to avoid React key warnings
+    df_reset = df_reset.fillna("")
 
     if len(df_reset) > max_rows:
         # Uniform sampling for better representation
