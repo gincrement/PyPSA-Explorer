@@ -108,17 +108,24 @@ def create_top_bar(network_labels: list[str], active_network_label: str) -> html
                     html.Div(
                         [
                             html.Span("Network", className="utility-label d-none d-md-inline"),
-                            dcc.Dropdown(
-                                id="network-selector",
-                                options=[{"label": label, "value": label} for label in network_labels],  # type: ignore[arg-type]
-                                value=active_network_label,
-                                clearable=False,
-                                className="network-selector",
+                            html.Div(
+                                [
+                                    html.Button(
+                                        label,
+                                        id={"type": "network-button", "index": label},
+                                        n_clicks=0,
+                                        className=f"network-button {'network-button-active' if label == active_network_label else ''}",
+                                    )
+                                    for label in network_labels
+                                ],
+                                className="network-button-group",
                             ),
+                            # Hidden store to track selected network
+                            dcc.Store(id="network-selector", data=active_network_label),
                         ],
                         id="top-bar-network-selector",
                         className="top-bar__selector",
-                        style={"display": "none"},
+                        style={"display": "flex" if len(network_labels) > 1 else "none"},
                     ),
                     html.Div(
                         [

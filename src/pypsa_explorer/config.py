@@ -717,6 +717,94 @@ h5 { font-size: 1.1rem; font-weight: 600; }
 }
 
 /* ===== FORMS & INPUTS ===== */
+/* Network Button Group Styling */
+
+.network-button-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.network-button {
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.network-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.network-button-active {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: var(--primary-color) !important;
+    border-color: white !important;
+    font-weight: 600;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.network-button-active:hover {
+    transform: none;
+}
+
+/* Ensure parent containers don't clip */
+#top-bar-network-selector,
+.top-bar__selector {
+    overflow: visible !important;
+}
+
+/* Generic Select styling for other dropdowns */
+.Select div[class*="control"] {
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.Select div[class*="menu"] {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+}
+
+.Select div[class*="option"] {
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+/* Multi-select value tags */
+.Select div[class*="multiValue"] {
+    background: linear-gradient(135deg, var(--accent-color), #3DB9B0) !important;
+    border: none !important;
+    border-radius: 6px !important;
+}
+
+.Select div[class*="multiValue"] div[class*="label"] {
+    color: white !important;
+    padding: 4px 8px !important;
+}
+
+.Select div[class*="multiValue"] div[class*="remove"] {
+    color: rgba(255, 255, 255, 0.8) !important;
+    cursor: pointer;
+}
+
+.Select div[class*="multiValue"] div[class*="remove"]:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    color: white !important;
+}
+
+/* Legacy class support for Dash 1.x compatibility (if needed) */
 .Select-control {
     border-radius: 10px;
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -737,13 +825,11 @@ h5 { font-size: 1.1rem; font-weight: 600; }
     transition: all var(--transition-fast);
 }
 
-/* Dropdown styling */
 .Select.is-focused .Select-control {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
 }
 
-/* Multi-select value styling */
 .Select-value {
     background: linear-gradient(135deg, var(--accent-color), #3DB9B0);
     border: none;
@@ -772,7 +858,13 @@ h5 { font-size: 1.1rem; font-weight: 600; }
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible !important;
+    max-height: none !important;
+}
+
+.Select-menu {
+    max-height: 300px !important;
+    overflow-y: auto !important;
 }
 
 .Select-option {
@@ -933,15 +1025,7 @@ footer {
     font-weight: 700;
 }
 
-/* Network selector dropdown styling */
-#network-selector .Select-value {
-    background: white !important;
-    color: var(--text-color) !important;
-}
-
-#network-selector .Select-value-label {
-    color: var(--text-color) !important;
-}
+/* Network selector dropdown styling - handled above in Dash 2.x styles */
 
 /* ===== KPI CARDS ===== */
 .kpi-card {
@@ -1199,6 +1283,40 @@ footer {
     color: #4ECDC4;
 }
 
+/* Dark mode network button styles */
+.dark-mode .network-button {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(226, 232, 240, 0.85);
+}
+
+.dark-mode .network-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(78, 205, 196, 0.4);
+    color: #E2E8F0;
+}
+
+.dark-mode .network-button-active {
+    background: rgba(78, 205, 196, 0.25) !important;
+    color: #4ECDC4 !important;
+    border-color: rgba(78, 205, 196, 0.5) !important;
+}
+
+/* Generic dark mode selects */
+.dark-mode .Select div[class*="control"] {
+    background: rgba(15, 20, 25, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .Select div[class*="menu"] {
+    background: rgba(15, 23, 42, 0.98);
+}
+
+.dark-mode .Select div[class*="option"] {
+    color: #E2E8F0;
+}
+
+/* Legacy dark mode styles for Dash 1.x compatibility */
 .dark-mode .Select-control {
     background: rgba(15, 20, 25, 0.8);
     border-color: rgba(255, 255, 255, 0.2);

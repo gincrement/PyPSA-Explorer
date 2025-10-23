@@ -58,17 +58,17 @@ def register_data_explorer_callbacks(app: dash.Dash, networks: dict[str, pypsa.N
             Input("close-data-explorer-modal", "n_clicks"),
         ],
         [
-            State("network-selector", "value"),
+            State("network-selector", "data"),
             State("data-explorer-modal", "is_open"),
         ],
     )
     def toggle_modal_and_load_data(
-        buses_clicks: int,  # noqa: ARG001
-        generators_clicks: int,  # noqa: ARG001
-        lines_clicks: int,  # noqa: ARG001
-        links_clicks: int,  # noqa: ARG001
-        storage_units_clicks: int,  # noqa: ARG001
-        stores_clicks: int,  # noqa: ARG001
+        buses_clicks: int,
+        generators_clicks: int,
+        lines_clicks: int,
+        links_clicks: int,
+        storage_units_clicks: int,
+        stores_clicks: int,
         close_clicks: int,  # noqa: ARG001
         network_label: str,
         is_open: bool,  # noqa: ARG001
@@ -83,6 +83,24 @@ def register_data_explorer_callbacks(app: dash.Dash, networks: dict[str, pypsa.N
 
         # If no KPI card was clicked, don't update
         if triggered_id not in KPI_COMPONENT_MAP:
+            return no_update, no_update, no_update, no_update, no_update, no_update, no_update  # type: ignore[return-value]
+
+        # Check if n_clicks is greater than 0 (actual click, not component recreation)
+        # When KPI cards are recreated during network switch, they reset to n_clicks=0
+        # This check prevents the modal from opening on network changes
+        click_counts = {
+            "kpi-card-buses": buses_clicks,
+            "kpi-card-generators": generators_clicks,
+            "kpi-card-lines": lines_clicks,
+            "kpi-card-links": links_clicks,
+            "kpi-card-storage_units": storage_units_clicks,
+            "kpi-card-stores": stores_clicks,
+        }
+
+        triggered_clicks = click_counts.get(triggered_id, 0)
+
+        # Only proceed if there was an actual click (n_clicks > 0)
+        if triggered_clicks == 0:
             return no_update, no_update, no_update, no_update, no_update, no_update, no_update  # type: ignore[return-value]
 
         # Get the component name from the triggered card
@@ -152,7 +170,7 @@ def register_data_explorer_callbacks(app: dash.Dash, networks: dict[str, pypsa.N
         ],
         [
             State("active-component-store", "data"),
-            State("network-selector", "value"),
+            State("network-selector", "data"),
         ],
     )
     def update_timeseries_data(

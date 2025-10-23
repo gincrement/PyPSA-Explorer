@@ -86,7 +86,8 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
                                 id="dashboard-content",
                                 style={"display": "none"},
                                 children=[
-                                    create_header(n),
+                                    # KPI header container that updates when network changes
+                                    html.Div(id="kpi-header-container", children=[create_header(n)]),
                                     # Main content with sidebar layout
                                     dbc.Row(
                                         [
