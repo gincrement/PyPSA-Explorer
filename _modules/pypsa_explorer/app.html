@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pypsa_explorer.app &mdash; PyPSA Explorer 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PyPSA Explorer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyPSA Explorer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pypsa_explorer.app</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pypsa_explorer.app</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Main application module for PyPSA Explorer dashboard.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">dash</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dash_bootstrap_components</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dbc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pypsa</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pypsa.consistency</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pypsa_explorer.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_all_callbacks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pypsa_explorer.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_html_template</span><span class="p">,</span> <span class="n">setup_plotly_theme</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pypsa_explorer.layouts.dashboard</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_dashboard_layout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pypsa_explorer.utils.network_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_networks</span>
+
+
+<div class="viewcode-block" id="create_app">
+<a class="viewcode-back" href="../../api.html#pypsa_explorer.app.create_app">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">(</span>
+    <span class="n">networks_input</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pypsa</span><span class="o">.</span><span class="n">Network</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PyPSA Explorer&quot;</span><span class="p">,</span>
+    <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: ARG001</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dash</span><span class="o">.</span><span class="n">Dash</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create and configure the Dash application.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    networks_input : dict, str, or None</span>
+<span class="sd">        Networks to load. Can be:</span>
+<span class="sd">        - dict: {label: network_object_or_path}</span>
+<span class="sd">        - str: Path to a single network file</span>
+<span class="sd">        - None: Load default demo network</span>
+<span class="sd">    title : str</span>
+<span class="sd">        Dashboard title</span>
+<span class="sd">    debug : bool</span>
+<span class="sd">        Whether to run in debug mode</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dash.Dash</span>
+<span class="sd">        Configured Dash application instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Setup Plotly theme</span>
+    <span class="n">setup_plotly_theme</span><span class="p">()</span>
+
+    <span class="c1"># Load networks</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="n">load_networks</span><span class="p">(</span><span class="n">networks_input</span><span class="p">)</span>
+
+    <span class="c1"># Get the first network as the active network initially</span>
+    <span class="n">network_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">networks</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">active_network_label</span> <span class="o">=</span> <span class="n">network_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Initialize Dash app</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">dash</span><span class="o">.</span><span class="n">Dash</span><span class="p">(</span>
+        <span class="vm">__name__</span><span class="p">,</span>
+        <span class="n">external_stylesheets</span><span class="o">=</span><span class="p">[</span><span class="n">dbc</span><span class="o">.</span><span class="n">themes</span><span class="o">.</span><span class="n">BOOTSTRAP</span><span class="p">],</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Set custom HTML template with embedded CSS</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">index_string</span> <span class="o">=</span> <span class="n">get_html_template</span><span class="p">()</span>
+
+    <span class="c1"># Create layout</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">create_dashboard_layout</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">active_network_label</span><span class="p">)</span>
+
+    <span class="c1"># Register all callbacks</span>
+    <span class="n">register_all_callbacks</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">networks</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">app</span></div>
+
+
+
+<div class="viewcode-block" id="run_dashboard">
+<a class="viewcode-back" href="../../api.html#pypsa_explorer.app.run_dashboard">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_dashboard</span><span class="p">(</span>
+    <span class="n">networks_input</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pypsa</span><span class="o">.</span><span class="n">Network</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+    <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8050</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run the PyPSA Explorer dashboard.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    networks_input : dict, str, or None</span>
+<span class="sd">        Networks to load. Can be:</span>
+<span class="sd">        - dict: {label: network_object_or_path} mapping labels to Network objects or file paths</span>
+<span class="sd">        - str: Single path to a network file</span>
+<span class="sd">        - None: Load default demo network</span>
+<span class="sd">    debug : bool</span>
+<span class="sd">        Whether to run in debug mode</span>
+<span class="sd">    host : str</span>
+<span class="sd">        Host to run the server on</span>
+<span class="sd">    port : int</span>
+<span class="sd">        Port to run the server on</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span><span class="n">networks_input</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting PyPSA Explorer Dashboard on http://</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Press Ctrl+C to stop the server&quot;</span><span class="p">)</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Open Energy Transition.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
