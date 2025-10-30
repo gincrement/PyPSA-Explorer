@@ -1,5 +1,7 @@
 """Navigation callbacks for PyPSA Explorer dashboard."""
 
+from typing import cast
+
 from dash import Input, Output, State, no_update
 
 
@@ -37,7 +39,17 @@ def register_navigation_callbacks(app) -> None:
                 {"display": "flex"},
             )
         if current_page == "dashboard" and has_network:
-            return no_update, no_update, no_update, {"display": "flex"}
+            return (
+                cast(dict[str, str], no_update),
+                cast(dict[str, str], no_update),
+                cast(dict[str, str], no_update),
+                {"display": "flex"},
+            )
 
         # No networks or still on welcome page keeps selector hidden
-        return no_update, no_update, no_update, {"display": "none"}
+        return (
+            cast(dict[str, str], no_update),
+            cast(dict[str, str], no_update),
+            cast(dict[str, str], no_update),
+            {"display": "none"},
+        )

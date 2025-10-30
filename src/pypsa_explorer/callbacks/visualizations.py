@@ -1,7 +1,7 @@
 """Visualization callbacks for PyPSA Explorer dashboard."""
 
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 import dash
 import dash_bootstrap_components as dbc
@@ -212,7 +212,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "energy-balance" and ctx.triggered_id != "tabs":
-            return dash.no_update
+            return cast(list[dbc.Col | html.Div | dcc.Graph] | html.Div, dash.no_update)
 
         if not selected_network_label or selected_network_label not in networks:
             return NO_NETWORK_SELECTED_MSG
@@ -244,7 +244,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "energy-balance-aggregated" and ctx.triggered_id != "tabs":
-            return dash.no_update
+            return cast(list[dbc.Col | html.Div | dcc.Graph] | html.Div, dash.no_update)
 
         if not selected_network_label or selected_network_label not in networks:
             return [NO_NETWORK_SELECTED_MSG]
@@ -276,7 +276,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
     ) -> list[dcc.Graph | html.Div]:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "capacity" and ctx.triggered_id != "tabs":
-            return dash.no_update
+            return cast(list[dcc.Graph | html.Div], dash.no_update)
 
         if not selected_network_label or selected_network_label not in networks:
             return [NO_NETWORK_SELECTED_MSG]
@@ -375,7 +375,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
     ) -> list[dcc.Graph | html.Div]:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "capex" and ctx.triggered_id != "tabs":
-            return dash.no_update
+            return cast(list[dcc.Graph | html.Div], dash.no_update)
 
         if not selected_network_label or selected_network_label not in networks:
             return [NO_NETWORK_SELECTED_MSG]
@@ -458,7 +458,7 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
     ) -> list[dcc.Graph | html.Div]:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "opex" and ctx.triggered_id != "tabs":
-            return dash.no_update
+            return cast(list[dcc.Graph | html.Div], dash.no_update)
 
         if not selected_network_label or selected_network_label not in networks:
             return [NO_NETWORK_SELECTED_MSG]

@@ -4,7 +4,8 @@ from typing import Any
 
 import dash_bootstrap_components as dbc
 import pypsa
-from dash import dash_table, dcc, html
+from dash import dcc, html
+from dash_table import DataTable
 
 from pypsa_explorer.utils.data_table import DATATABLE_BASE_CONFIG
 
@@ -246,6 +247,7 @@ def create_header(n: pypsa.Network | None) -> html.Div:
         ]
 
     def _metric_col(card_id: str, icon_class: str, value: str, label: str, aria_label: str) -> dbc.Col:
+        aria_kwargs: dict[str, str] = {"aria-label": aria_label}
         return dbc.Col(
             html.Div(
                 [
@@ -258,7 +260,7 @@ def create_header(n: pypsa.Network | None) -> html.Div:
                 className="kpi-card kpi-card-clickable" if n is not None else "kpi-card kpi-card-disabled",
                 role="button",
                 tabIndex="0",
-                **{"aria-label": aria_label},
+                **aria_kwargs,  # type: ignore[arg-type]
             ),
             xs=12,
             sm=6,
@@ -440,7 +442,7 @@ def create_data_explorer_modal() -> dbc.Modal:
                                         id="static-data-container",
                                         className="mt-3",
                                         children=[
-                                            dash_table.DataTable(
+                                            DataTable(
                                                 id="static-data-table",
                                                 **DATATABLE_BASE_CONFIG,
                                             )
@@ -481,7 +483,7 @@ def create_data_explorer_modal() -> dbc.Modal:
                                             html.Div(
                                                 id="timeseries-data-container",
                                                 children=[
-                                                    dash_table.DataTable(
+                                                    DataTable(
                                                         id="timeseries-data-table",
                                                         **DATATABLE_BASE_CONFIG,
                                                     )

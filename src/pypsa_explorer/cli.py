@@ -1,6 +1,9 @@
 """Command-line interface for PyPSA Explorer."""
 
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated, cast
+
+if TYPE_CHECKING:
+    import pypsa
 
 import typer
 from rich.console import Console
@@ -99,7 +102,7 @@ def main(
     if networks:
         try:
             network_paths = parse_cli_network_args(networks)
-            networks_input = network_paths
+            networks_input = cast("dict[str, pypsa.Network | str]", network_paths)
 
             # Display network info
             network_table = Table(title="📊 Networks to Load", show_header=True, header_style="bold magenta")
