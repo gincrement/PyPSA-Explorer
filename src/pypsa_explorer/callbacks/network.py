@@ -291,9 +291,11 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network], *, defau
                             (
                                 "Bundled example"
                                 if info.get(label, {}).get("origin") == "example"
-                                else Path(info.get(label, {}).get("source", "")).name
-                                if info.get(label, {}).get("source")
-                                else "Uploaded"
+                                else (
+                                    Path(info.get(label, {}).get("source", "")).name
+                                    if info.get(label, {}).get("source")
+                                    else "Uploaded"
+                                )
                             ),
                             className="text-muted",
                         ),
