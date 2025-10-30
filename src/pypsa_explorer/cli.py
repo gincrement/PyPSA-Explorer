@@ -79,7 +79,7 @@ def main(
 
     [dim]Examples:[/dim]
 
-    [cyan]# Run with default demo network[/cyan]
+    [cyan]# Launch interactive landing page (drag-and-drop networks)[/cyan]
     $ pypsa-explorer
 
     [cyan]# Run with a single network[/cyan]
@@ -117,12 +117,14 @@ def main(
             raise typer.Exit(1) from None
 
     # Display startup banner
+    network_summary = len(networks_input) if networks_input else "interactive"
+
     startup_panel = Panel.fit(
         f"""[bold cyan]PyPSA Explorer[/bold cyan] [green]v{__version__}[/green]
 
 🌐 Server: [yellow]{host}:{port}[/yellow]
 🐛 Debug Mode: [yellow]{"enabled" if debug else "disabled"}[/yellow]
-📁 Networks: [yellow]{len(networks_input) if networks_input else "demo"}[/yellow]
+📁 Networks: [yellow]{network_summary}[/yellow]
 
 [dim]Press Ctrl+C to stop the server[/dim]""",
         title="🔌 Starting Dashboard",
@@ -138,6 +140,7 @@ def main(
             debug=debug,
             host=host,
             port=port,
+            load_default_on_start=networks_input is not None,
         )
     except KeyboardInterrupt:
         console.print("\n[yellow]⏹  Shutting down PyPSA Explorer...[/yellow]")

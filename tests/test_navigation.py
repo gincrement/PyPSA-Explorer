@@ -1,6 +1,5 @@
 """Tests for navigation functionality."""
 
-import pytest
 from dash import Dash, no_update
 
 from pypsa_explorer.callbacks.navigation import register_navigation_callbacks
@@ -46,9 +45,10 @@ class TestNavigationCallbackRegistration:
 
         # Check states
         states = callback_info["state"]
-        assert len(states) == 1
+        assert len(states) == 2
         state_ids = [str(s) for s in states]
         assert any("page-state" in sid and "data" in sid for sid in state_ids)
+        assert any("network-registry" in sid and "data" in sid for sid in state_ids)
 
 
 class TestNavigationLogic:
@@ -65,7 +65,9 @@ class TestNavigationLogic:
 
         # Test navigation with button click and welcome page state
         welcome_style, dashboard_style, page_state, selector_style = callback_func(
-            n_clicks=1, page_state={"current_page": "welcome"}
+            n_clicks=1,
+            page_state={"current_page": "welcome"},
+            registry={"order": ["Test"], "info": {}},
         )
 
         # Check welcome is hidden
@@ -90,10 +92,14 @@ class TestNavigationLogic:
         callback_func = callback_info["callback"].__wrapped__
 
         # Test with already on dashboard
-        result = callback_func(n_clicks=1, page_state={"current_page": "dashboard"})
+        result = callback_func(
+            n_clicks=1,
+            page_state={"current_page": "dashboard"},
+            registry={"order": ["Test"], "info": {}},
+        )
 
         # Should return no_update for all outputs
-        assert result == (no_update, no_update, no_update, no_update)
+        assert result == (no_update, no_update, no_update, {"display": "flex"})
 
     def test_no_navigation_without_click(self):
         """Test that navigation doesn't happen without button click."""
@@ -105,10 +111,14 @@ class TestNavigationLogic:
         callback_func = callback_info["callback"].__wrapped__
 
         # Test with no click
-        result = callback_func(n_clicks=None, page_state={"current_page": "welcome"})
+        result = callback_func(
+            n_clicks=None,
+            page_state={"current_page": "welcome"},
+            registry={"order": ["Test"], "info": {}},
+        )
 
         # Should return no_update for all outputs
-        assert result == (no_update, no_update, no_update, no_update)
+        assert result == (no_update, no_update, no_update, {"display": "none"})
 
     def test_zero_clicks_navigation(self):
         """Test that navigation doesn't happen with zero clicks."""
@@ -120,10 +130,14 @@ class TestNavigationLogic:
         callback_func = callback_info["callback"].__wrapped__
 
         # Test with zero clicks
-        result = callback_func(n_clicks=0, page_state={"current_page": "welcome"})
+        result = callback_func(
+            n_clicks=0,
+            page_state={"current_page": "welcome"},
+            registry={"order": ["Test"], "info": {}},
+        )
 
         # Should return no_update for all outputs
-        assert result == (no_update, no_update, no_update, no_update)
+        assert result == (no_update, no_update, no_update, {"display": "none"})
 
 
 class TestNavigationIntegration:
@@ -193,7 +207,9 @@ class TestNavigationEdgeCases:
 
         # Test with multiple clicks
         welcome_style, dashboard_style, page_state, selector_style = callback_func(
-            n_clicks=5, page_state={"current_page": "welcome"}
+            n_clicks=5,
+            page_state={"current_page": "welcome"},
+            registry={"order": ["Test"], "info": {}},
         )
 
         # Should still navigate correctly
@@ -211,10 +227,14 @@ class TestNavigationEdgeCases:
         callback_func = callback_info["callback"].__wrapped__
 
         # Test with invalid page state (should not navigate)
-        result = callback_func(n_clicks=1, page_state={"current_page": "invalid"})
+        result = callback_func(
+            n_clicks=1,
+            page_state={"current_page": "invalid"},
+            registry={"order": ["Test"], "info": {}},
+        )
 
         # Should return no_update for all outputs
-        assert result == (no_update, no_update, no_update, no_update)
+        assert result == (no_update, no_update, no_update, {"display": "none"})
 
     def test_empty_page_state(self):
         """Test handling of empty page state."""
@@ -225,8 +245,8 @@ class TestNavigationEdgeCases:
         callback_func = callback_info["callback"].__wrapped__
 
         # Test with empty page state
-        with pytest.raises(KeyError):
-            callback_func(n_clicks=1, page_state={})
+        result = callback_func(n_clicks=1, page_state={}, registry={"order": ["Test"], "info": {}})
+        assert result == (no_update, no_update, no_update, {"display": "none"})
 
     def test_none_page_state(self):
         """Test handling of None page state."""
@@ -237,8 +257,8 @@ class TestNavigationEdgeCases:
         callback_func = callback_info["callback"].__wrapped__
 
         # Test with None page state
-        with pytest.raises((TypeError, KeyError)):
-            callback_func(n_clicks=1, page_state=None)
+        result = callback_func(n_clicks=1, page_state=None, registry={"order": ["Test"], "info": {}})
+        assert result == (no_update, no_update, no_update, {"display": "none"})
 
 
 class TestUtilityBarVisibility:
@@ -265,7 +285,11 @@ class TestUtilityBarVisibility:
         callback_func = callback_info["callback"].__wrapped__
 
         # Navigate to dashboard
-        _, _, _, selector_style = callback_func(n_clicks=1, page_state={"current_page": "welcome"})
+        _, _, _, selector_style = callback_func(
+            n_clicks=1,
+            page_state={"current_page": "welcome"},
+            registry={"order": ["Test"], "info": {}},
+        )
 
         # Network selector should be visible
         assert selector_style == {"display": "flex"}

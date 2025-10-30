@@ -10,7 +10,12 @@ import pypsa
 from dash import Input, Output, ctx, dcc, html
 
 from pypsa_explorer.config import COLORS, COLORS_DARK, PLOTLY_TEMPLATE_NAME, PLOTLY_TEMPLATE_NAME_DARK
-from pypsa_explorer.layouts.components import NO_DATA_MSG, PLEASE_SELECT_CARRIER_MSG, create_error_message
+from pypsa_explorer.layouts.components import (
+    NO_DATA_MSG,
+    NO_NETWORK_SELECTED_MSG,
+    PLEASE_SELECT_CARRIER_MSG,
+    create_error_message,
+)
 from pypsa_explorer.utils.helpers import get_carrier_nice_name, get_country_filter
 
 
@@ -201,13 +206,16 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
         selected_carriers: list[str],
         country_mode: str,
         selected_countries: list[str],
-        selected_network_label: str,
+        selected_network_label: str | None,
         active_tab: str,
         is_dark_mode: bool,
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "energy-balance" and ctx.triggered_id != "tabs":
             return dash.no_update
+
+        if not selected_network_label or selected_network_label not in networks:
+            return NO_NETWORK_SELECTED_MSG
 
         return create_energy_balance_callback(aggregated=False)(
             selected_carriers, country_mode, selected_countries, selected_network_label, is_dark_mode
@@ -230,13 +238,16 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
         selected_carriers: list[str],
         country_mode: str,
         selected_countries: list[str],
-        selected_network_label: str,
+        selected_network_label: str | None,
         active_tab: str,
         is_dark_mode: bool,
     ) -> list[dbc.Col | html.Div | dcc.Graph] | html.Div:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "energy-balance-aggregated" and ctx.triggered_id != "tabs":
             return dash.no_update
+
+        if not selected_network_label or selected_network_label not in networks:
+            return [NO_NETWORK_SELECTED_MSG]
 
         return create_energy_balance_callback(aggregated=True)(
             selected_carriers, country_mode, selected_countries, selected_network_label, is_dark_mode
@@ -259,13 +270,16 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
         selected_carriers: list[str],
         country_mode: str,
         selected_countries: list[str],
-        selected_network_label: str,
+        selected_network_label: str | None,
         active_tab: str,
         is_dark_mode: bool,
     ) -> list[dcc.Graph | html.Div]:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "capacity" and ctx.triggered_id != "tabs":
             return dash.no_update
+
+        if not selected_network_label or selected_network_label not in networks:
+            return [NO_NETWORK_SELECTED_MSG]
 
         n = networks[selected_network_label]
         s = n.statistics
@@ -355,13 +369,16 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
     def update_capex_charts(
         country_mode: str,
         selected_countries: list[str],
-        selected_network_label: str,
+        selected_network_label: str | None,
         active_tab: str,
         is_dark_mode: bool,
     ) -> list[dcc.Graph | html.Div]:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "capex" and ctx.triggered_id != "tabs":
             return dash.no_update
+
+        if not selected_network_label or selected_network_label not in networks:
+            return [NO_NETWORK_SELECTED_MSG]
 
         n = networks[selected_network_label]
         s = n.statistics
@@ -435,13 +452,16 @@ def register_visualization_callbacks(app, networks: dict[str, pypsa.Network]) ->
     def update_opex_charts(
         country_mode: str,
         selected_countries: list[str],
-        selected_network_label: str,
+        selected_network_label: str | None,
         active_tab: str,
         is_dark_mode: bool,
     ) -> list[dcc.Graph | html.Div]:
         # Only render if this tab is active OR if tab just became active
         if active_tab != "opex" and ctx.triggered_id != "tabs":
             return dash.no_update
+
+        if not selected_network_label or selected_network_label not in networks:
+            return [NO_NETWORK_SELECTED_MSG]
 
         n = networks[selected_network_label]
         s = n.statistics

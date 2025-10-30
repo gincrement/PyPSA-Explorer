@@ -1,10 +1,14 @@
 """Welcome page layout for PyPSA Explorer dashboard."""
 
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import dcc, html
 
 
-def create_welcome_page(network_labels: list[str], networks_info: dict[str, dict[str, int]]) -> dbc.Card:
+def create_welcome_page(
+    network_labels: list[str],
+    networks_info: dict[str, dict[str, int | str]],
+    demo_network_available: bool,
+) -> dbc.Card:
     """
     Create the welcome page for the dashboard.
 
@@ -14,6 +18,8 @@ def create_welcome_page(network_labels: list[str], networks_info: dict[str, dict
         List of available network labels
     networks_info : dict[str, dict[str, int]]
         Dictionary with network info: {label: {"buses": count, "links": count, "lines": count}}
+    demo_network_available : bool
+        Whether the bundled example network is available for loading
 
     Returns
     -------
@@ -99,6 +105,65 @@ def create_welcome_page(network_labels: list[str], networks_info: dict[str, dict
                         ),
                     ],
                     className="welcome-card mb-4",
+                ),
+                # Upload and sample section
+                html.Div(
+                    [
+                        dcc.Upload(
+                            id="network-upload",
+                            multiple=True,
+                            accept=".nc",
+                            children=html.Div(
+                                [
+                                    html.Div(
+                                        html.I(
+                                            className="fas fa-cloud-upload-alt",
+                                            style={"fontSize": "2rem", "marginBottom": "12px"},
+                                        ),
+                                        className="mb-2",
+                                    ),
+                                    html.H4("Drop .nc files here", className="mb-2"),
+                                    html.P(
+                                        "Drag and drop PyPSA NetCDF networks or click to browse.",
+                                        className="text-muted",
+                                        style={"margin": 0},
+                                    ),
+                                ],
+                                className="upload-dropzone",
+                                style={
+                                    "border": "2px dashed rgba(0, 102, 204, 0.4)",
+                                    "borderRadius": "24px",
+                                    "padding": "40px",
+                                    "textAlign": "center",
+                                    "cursor": "pointer",
+                                    "background": "rgba(0, 102, 204, 0.05)",
+                                    "transition": "border-color 0.3s ease",
+                                },
+                            ),
+                        ),
+                        html.Div(id="upload-feedback", className="mt-3"),
+                        html.Div(
+                            [
+                                dbc.Button(
+                                    [
+                                        html.I(className="fas fa-play", style={"marginRight": "8px"}),
+                                        "Load Example Network",
+                                    ],
+                                    id="load-example-network-btn",
+                                    color="secondary",
+                                    disabled=not demo_network_available,
+                                    className="mt-3",
+                                ),
+                                html.Small(
+                                    "Example network unavailable in this build.",
+                                    className="text-muted d-block mt-2",
+                                    style={"display": "block" if not demo_network_available else "none"},
+                                ),
+                            ],
+                            className="text-center",
+                        ),
+                    ],
+                    className="welcome-upload-section mb-5",
                 ),
                 dbc.Row(
                     [
@@ -236,6 +301,7 @@ def create_welcome_page(network_labels: list[str], networks_info: dict[str, dict
                                     id="enter-dashboard-btn",
                                     size="lg",
                                     className="mt-4",
+                                    disabled=not network_labels,
                                     style={
                                         "background": "linear-gradient(135deg, #0066CC 0%, #4ECDC4 100%)",
                                         "border": "none",

@@ -60,6 +60,22 @@ NO_DATA_MSG = html.Div(
 )
 
 
+NO_NETWORK_SELECTED_MSG = html.Div(
+    [
+        html.Div(
+            [html.I(className="fas fa-upload", style={"fontSize": "3rem", "color": "#5C6BC0", "marginBottom": "20px"})],
+        ),
+        html.H4("Load a Network", style={"marginBottom": "12px", "fontWeight": "600"}),
+        html.P(
+            "Drag a .nc file into the welcome screen or use the sample loader.",
+            className="text-muted",
+            style={"fontSize": "1rem"},
+        ),
+    ],
+    className="text-center my-5 p-5 empty-state",
+)
+
+
 def create_dark_mode_toggle() -> html.Div:
     """Create the dark mode toggle control."""
 
@@ -88,7 +104,7 @@ def create_dark_mode_toggle() -> html.Div:
     )
 
 
-def create_top_bar(network_labels: list[str], active_network_label: str) -> html.Div:
+def create_top_bar(network_labels: list[str], active_network_label: str | None) -> html.Div:
     """Create the primary top bar with branding, network selection, and display controls."""
 
     return html.Div(
@@ -118,6 +134,7 @@ def create_top_bar(network_labels: list[str], active_network_label: str) -> html
                                     )
                                     for label in network_labels
                                 ],
+                                id="network-button-group",
                                 className="network-button-group",
                             ),
                             # Hidden store to track selected network
@@ -125,7 +142,7 @@ def create_top_bar(network_labels: list[str], active_network_label: str) -> html
                         ],
                         id="top-bar-network-selector",
                         className="top-bar__selector",
-                        style={"display": "flex" if len(network_labels) > 1 else "none"},
+                        style={"display": "none"},
                     ),
                     html.Div(
                         [
@@ -170,140 +187,102 @@ def create_error_message(context: str, error: Exception) -> html.Div:
     )
 
 
-def create_header(n: pypsa.Network) -> html.Div:
+def create_header(n: pypsa.Network | None) -> html.Div:
     """Create the KPI section for the active network."""
 
-    total_buses = len(n.buses)
-    total_generators = len(n.generators) if hasattr(n, "generators") else 0
-    total_lines = len(n.lines) if hasattr(n, "lines") else 0
-    total_links = len(n.links) if hasattr(n, "links") else 0
-    total_storage_units = len(n.storage_units) if hasattr(n, "storage_units") else 0
-    total_stores = len(n.stores) if hasattr(n, "stores") else 0
+    if n is not None:
+        metrics = [
+            ("kpi-card-buses", "fas fa-circle-nodes", str(len(n.buses)), "Nodes", "View detailed bus data"),
+            (
+                "kpi-card-generators",
+                "fas fa-bolt",
+                str(len(n.generators) if hasattr(n, "generators") else 0),
+                "Generators",
+                "View detailed generator data",
+            ),
+            (
+                "kpi-card-lines",
+                "fas fa-bezier-curve",
+                str(len(n.lines) if hasattr(n, "lines") else 0),
+                "Lines",
+                "View detailed line data",
+            ),
+            (
+                "kpi-card-links",
+                "fas fa-link",
+                str(len(n.links) if hasattr(n, "links") else 0),
+                "Links",
+                "View detailed link data",
+            ),
+            (
+                "kpi-card-storage_units",
+                "fas fa-battery-three-quarters",
+                str(len(n.storage_units) if hasattr(n, "storage_units") else 0),
+                "Storage Units",
+                "View detailed storage unit data",
+            ),
+            (
+                "kpi-card-stores",
+                "fas fa-warehouse",
+                str(len(n.stores) if hasattr(n, "stores") else 0),
+                "Stores",
+                "View detailed store data",
+            ),
+        ]
+    else:
+        metrics = [
+            ("kpi-card-buses", "fas fa-circle-nodes", "—", "Nodes", "View detailed bus data"),
+            ("kpi-card-generators", "fas fa-bolt", "—", "Generators", "View detailed generator data"),
+            ("kpi-card-lines", "fas fa-bezier-curve", "—", "Lines", "View detailed line data"),
+            ("kpi-card-links", "fas fa-link", "—", "Links", "View detailed link data"),
+            (
+                "kpi-card-storage_units",
+                "fas fa-battery-three-quarters",
+                "—",
+                "Storage Units",
+                "View detailed storage unit data",
+            ),
+            ("kpi-card-stores", "fas fa-warehouse", "—", "Stores", "View detailed store data"),
+        ]
 
-    return html.Div(
-        [
-            dbc.Row(
+    def _metric_col(card_id: str, icon_class: str, value: str, label: str, aria_label: str) -> dbc.Col:
+        return dbc.Col(
+            html.Div(
                 [
-                    dbc.Col(
-                        html.Div(
-                            [
-                                html.Div([html.I(className="fas fa-circle-nodes")], className="kpi-icon"),
-                                html.Div(str(total_buses), className="kpi-value"),
-                                html.Div("Nodes", className="kpi-label"),
-                            ],
-                            id="kpi-card-buses",
-                            n_clicks=0,
-                            className="kpi-card kpi-card-clickable",
-                            role="button",
-                            tabIndex="0",
-                            **{"aria-label": "View detailed bus data"},
-                        ),
-                        xs=12,
-                        sm=6,
-                        md=4,
-                        lg=2,
-                    ),
-                    dbc.Col(
-                        html.Div(
-                            [
-                                html.Div([html.I(className="fas fa-bolt")], className="kpi-icon"),
-                                html.Div(str(total_generators), className="kpi-value"),
-                                html.Div("Generators", className="kpi-label"),
-                            ],
-                            id="kpi-card-generators",
-                            n_clicks=0,
-                            className="kpi-card kpi-card-clickable",
-                            role="button",
-                            tabIndex="0",
-                            **{"aria-label": "View detailed generator data"},
-                        ),
-                        xs=12,
-                        sm=6,
-                        md=4,
-                        lg=2,
-                    ),
-                    dbc.Col(
-                        html.Div(
-                            [
-                                html.Div([html.I(className="fas fa-bezier-curve")], className="kpi-icon"),
-                                html.Div(str(total_lines), className="kpi-value"),
-                                html.Div("Lines", className="kpi-label"),
-                            ],
-                            id="kpi-card-lines",
-                            n_clicks=0,
-                            className="kpi-card kpi-card-clickable",
-                            role="button",
-                            tabIndex="0",
-                            **{"aria-label": "View detailed line data"},
-                        ),
-                        xs=12,
-                        sm=6,
-                        md=4,
-                        lg=2,
-                    ),
-                    dbc.Col(
-                        html.Div(
-                            [
-                                html.Div([html.I(className="fas fa-link")], className="kpi-icon"),
-                                html.Div(str(total_links), className="kpi-value"),
-                                html.Div("Links", className="kpi-label"),
-                            ],
-                            id="kpi-card-links",
-                            n_clicks=0,
-                            className="kpi-card kpi-card-clickable",
-                            role="button",
-                            tabIndex="0",
-                            **{"aria-label": "View detailed link data"},
-                        ),
-                        xs=12,
-                        sm=6,
-                        md=4,
-                        lg=2,
-                    ),
-                    dbc.Col(
-                        html.Div(
-                            [
-                                html.Div([html.I(className="fas fa-battery-three-quarters")], className="kpi-icon"),
-                                html.Div(str(total_storage_units), className="kpi-value"),
-                                html.Div("Storage Units", className="kpi-label"),
-                            ],
-                            id="kpi-card-storage_units",
-                            n_clicks=0,
-                            className="kpi-card kpi-card-clickable",
-                            role="button",
-                            tabIndex="0",
-                            **{"aria-label": "View detailed storage unit data"},
-                        ),
-                        xs=12,
-                        sm=6,
-                        md=4,
-                        lg=2,
-                    ),
-                    dbc.Col(
-                        html.Div(
-                            [
-                                html.Div([html.I(className="fas fa-warehouse")], className="kpi-icon"),
-                                html.Div(str(total_stores), className="kpi-value"),
-                                html.Div("Stores", className="kpi-label"),
-                            ],
-                            id="kpi-card-stores",
-                            n_clicks=0,
-                            className="kpi-card kpi-card-clickable",
-                            role="button",
-                            tabIndex="0",
-                            **{"aria-label": "View detailed store data"},
-                        ),
-                        xs=12,
-                        sm=6,
-                        md=4,
-                        lg=2,
-                    ),
+                    html.Div([html.I(className=icon_class)], className="kpi-icon"),
+                    html.Div(value, className="kpi-value"),
+                    html.Div(label, className="kpi-label"),
                 ],
-                className="g-3",
+                id=card_id,
+                n_clicks=0,
+                className="kpi-card kpi-card-clickable" if n is not None else "kpi-card kpi-card-disabled",
+                role="button",
+                tabIndex="0",
+                **{"aria-label": aria_label},
+            ),
+            xs=12,
+            sm=6,
+            md=4,
+            lg=2,
+        )
+
+    header_children: list = []
+    if n is None:
+        header_children.append(
+            html.Div(
+                "Load a network to view KPIs.",
+                className="text-muted text-center py-4",
             )
-        ],
-        className="app-header",
+        )
+
+    header_children.append(
+        dbc.Row(
+            [_metric_col(*metric) for metric in metrics],
+            className="g-3",
+        )
     )
+
+    return html.Div(header_children, className="app-header")
 
 
 def create_sidebar_filter_panel(

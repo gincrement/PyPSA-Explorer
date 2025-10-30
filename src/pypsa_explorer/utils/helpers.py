@@ -1,6 +1,8 @@
 """Helper utility functions for PyPSA Explorer."""
 
 import re
+from contextlib import suppress
+from pathlib import Path
 from typing import Any
 
 import pypsa
@@ -160,3 +162,47 @@ def get_country_filter(country_mode: str, selected_countries: list[str]) -> tupl
             return query, "country", None
     # Default is "All" countries
     return None, None, None
+
+
+def summarize_network(n: pypsa.Network) -> dict[str, int | str]:
+    """Summarize basic counts for a PyPSA network."""
+
+    return {
+        "buses": len(getattr(n, "buses", [])),
+        "links": len(getattr(n, "links", [])),
+        "lines": len(getattr(n, "lines", [])),
+    }
+
+
+def resolve_default_network_path(default_path: str | None = "demo-network.nc") -> Path | None:
+    """Locate the bundled demo network if available."""
+
+    if not default_path:
+        return None
+
+    candidate = Path(default_path)
+    search_paths = [candidate]
+
+    if not candidate.is_absolute():
+        file_parents = Path(__file__).resolve().parents
+        base_paths = []
+        if len(file_parents) > 3:
+            base_paths.append(file_parents[3])  # repository root when running from source
+        if len(file_parents) > 1:
+            base_paths.append(file_parents[1])  # package directory when installed
+        base_paths.append(Path.cwd())
+        search_paths.extend(base / default_path for base in base_paths)
+
+    for path in search_paths:
+        if path.is_file():
+            return path
+
+    with suppress(Exception):
+        from importlib import resources
+
+        resource = resources.files("pypsa_explorer") / default_path
+        if resource.is_file():
+            with resources.as_file(resource) as tmp_path:
+                return Path(tmp_path)
+
+    return None

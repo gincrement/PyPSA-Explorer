@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-def register_all_callbacks(app, networks: dict) -> None:
+def register_all_callbacks(app, networks: dict, *, default_network_path: str) -> None:
     """
     Register all dashboard callbacks.
 
@@ -30,7 +30,7 @@ def register_all_callbacks(app, networks: dict) -> None:
     """
     register_filter_callbacks(app)
     register_navigation_callbacks(app)
-    register_network_callbacks(app, networks)
+    register_network_callbacks(app, networks, default_network_path=default_network_path)
     register_visualization_callbacks(app, networks)
     register_data_explorer_callbacks(app, networks)
     register_theme_callbacks(app)
