@@ -4,8 +4,7 @@ from typing import Any
 
 import dash_bootstrap_components as dbc
 import pypsa
-from dash import dcc, html
-from dash_table import DataTable
+from dash import dash_table, dcc, html
 
 from pypsa_explorer.utils.data_table import DATATABLE_BASE_CONFIG
 
@@ -442,7 +441,7 @@ def create_data_explorer_modal() -> dbc.Modal:
                                         id="static-data-container",
                                         className="mt-3",
                                         children=[
-                                            DataTable(
+                                            dash_table.DataTable(  # type: ignore[attr-defined]
                                                 id="static-data-table",
                                                 **DATATABLE_BASE_CONFIG,
                                             )
@@ -483,7 +482,7 @@ def create_data_explorer_modal() -> dbc.Modal:
                                             html.Div(
                                                 id="timeseries-data-container",
                                                 children=[
-                                                    DataTable(
+                                                    dash_table.DataTable(  # type: ignore[attr-defined]
                                                         id="timeseries-data-table",
                                                         **DATATABLE_BASE_CONFIG,
                                                     )
