@@ -46,6 +46,20 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network], *, defau
             suffix += 1
         return candidate
 
+    def _safe_upload_filename(raw_name: str) -> str:
+        cleaned = raw_name.strip()
+        if not cleaned:
+            raise ValueError("Upload is missing a filename")
+        candidate = Path(cleaned)
+        if candidate.is_absolute():
+            raise ValueError("Absolute upload paths are not allowed")
+        if any(part == ".." for part in candidate.parts):
+            raise ValueError("Parent path segments are not allowed in upload filenames")
+        sanitized = candidate.name
+        if not sanitized:
+            raise ValueError("Invalid upload filename")
+        return sanitized
+
     def _write_uploaded_file(content: str, filename: str) -> Path:
         if "," not in content:
             raise ValueError("Unexpected upload payload")
@@ -53,9 +67,10 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network], *, defau
         if "base64" not in header:
             raise ValueError("Upload payload is not base64 encoded")
         file_bytes = base64.b64decode(encoded)
-        target_path = uploads_dir / filename
+        sanitized_name = _safe_upload_filename(filename)
+        target_path = uploads_dir / sanitized_name
         counter = 1
-        stem = target_path.stem
+        stem = target_path.stem or "network"
         suffix = target_path.suffix or ".nc"
         while target_path.exists():
             target_path = uploads_dir / f"{stem}_{counter}{suffix}"
