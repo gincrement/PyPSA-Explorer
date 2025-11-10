@@ -29,7 +29,7 @@ dependencies = [
     "folium>=0.14",
     "mapclassify>=2.5",
     "dash-bootstrap-components>=1.5",
-    "pypsa @ git+https://github.com/PyPSA/PyPSA.git@master",
+    "pypsa>=1.0.3",
     "pyyaml>=6.0",
     "typer>=0.9",
     "rich>=13.0",
