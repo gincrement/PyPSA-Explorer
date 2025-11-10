@@ -58,7 +58,7 @@ pre-commit install
 
 ### Command Line Interface
 
-Run with default demo network:
+Launch the landing page and drag-and-drop networks or load the bundled example:
 ```bash
 pypsa-explorer
 ```

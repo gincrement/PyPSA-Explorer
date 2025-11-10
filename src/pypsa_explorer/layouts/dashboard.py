@@ -1,5 +1,7 @@
 """Main dashboard layout for PyPSA Explorer."""
 
+from pathlib import Path
+
 import dash_bootstrap_components as dbc
 import pypsa
 from dash import dcc, html
@@ -21,10 +23,15 @@ from pypsa_explorer.layouts.tabs import (
     create_opex_totals_tab,
 )
 from pypsa_explorer.layouts.welcome import create_welcome_page
-from pypsa_explorer.utils.helpers import get_bus_carrier_options, get_country_options
+from pypsa_explorer.utils.helpers import get_bus_carrier_options, get_country_options, summarize_network
 
 
-def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_label: str) -> dbc.Container:
+def create_dashboard_layout(
+    networks: dict[str, pypsa.Network],
+    active_network_label: str | None,
+    *,
+    default_network_path: str = "demo-network.nc",
+) -> dbc.Container:
     """
     Create the complete dashboard layout.
 
@@ -40,28 +47,31 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
     dbc.Container
         Complete dashboard layout
     """
-    n = networks[active_network_label]
     network_labels = list(networks.keys())
+    n = networks[active_network_label] if active_network_label else None
 
     # Get options for filters
-    bus_carrier_options = get_bus_carrier_options(n)
-    country_options = get_country_options(n)
+    bus_carrier_options = get_bus_carrier_options(n) if n else []
+    country_options = get_country_options(n) if n else []
 
     # Prepare network info for welcome page
-    networks_info = {
-        label: {
-            "buses": len(net.buses),
-            "links": len(net.links),
-            "lines": len(net.lines),
-        }
-        for label, net in networks.items()
-    }
+    networks_info = {label: summarize_network(net) for label, net in networks.items()} if networks else {}
+    demo_network_available = Path(default_network_path).is_file()
 
     return dbc.Container(
         fluid=True,
         children=[
             # Store component to manage page state
             dcc.Store(id="page-state", data={"current_page": "welcome"}),
+            # Store available networks metadata for dynamic updates
+            dcc.Store(
+                id="network-registry",
+                data={
+                    "order": network_labels,
+                    "info": networks_info,
+                    "defaultNetworkPath": default_network_path,
+                },
+            ),
             # Store component for dark mode state (cached)
             dcc.Store(id="dark-mode-store", data=False),
             # Data explorer modal
@@ -79,7 +89,13 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
                             # Welcome page content will be shown initially
                             html.Div(
                                 id="welcome-content",
-                                children=[create_welcome_page(network_labels, networks_info)],
+                                children=[
+                                    create_welcome_page(
+                                        network_labels,
+                                        networks_info,
+                                        demo_network_available,
+                                    )
+                                ],
                             ),
                             # Main dashboard content (initially hidden)
                             html.Div(
@@ -87,7 +103,10 @@ def create_dashboard_layout(networks: dict[str, pypsa.Network], active_network_l
                                 style={"display": "none"},
                                 children=[
                                     # KPI header container that updates when network changes
-                                    html.Div(id="kpi-header-container", children=[create_header(n)]),
+                                    html.Div(
+                                        id="kpi-header-container",
+                                        children=[create_header(n)],
+                                    ),
                                     # Main content with sidebar layout
                                     dbc.Row(
                                         [

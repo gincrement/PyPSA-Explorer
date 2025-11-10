@@ -1,6 +1,9 @@
 """Command-line interface for PyPSA Explorer."""
 
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated, cast
+
+if TYPE_CHECKING:
+    import pypsa
 
 import typer
 from rich.console import Console
@@ -79,7 +82,7 @@ def main(
 
     [dim]Examples:[/dim]
 
-    [cyan]# Run with default demo network[/cyan]
+    [cyan]# Launch interactive landing page (drag-and-drop networks)[/cyan]
     $ pypsa-explorer
 
     [cyan]# Run with a single network[/cyan]
@@ -99,7 +102,7 @@ def main(
     if networks:
         try:
             network_paths = parse_cli_network_args(networks)
-            networks_input = network_paths
+            networks_input = cast("dict[str, pypsa.Network | str]", network_paths)
 
             # Display network info
             network_table = Table(title="📊 Networks to Load", show_header=True, header_style="bold magenta")
@@ -117,12 +120,14 @@ def main(
             raise typer.Exit(1) from None
 
     # Display startup banner
+    network_summary = len(networks_input) if networks_input else "interactive"
+
     startup_panel = Panel.fit(
         f"""[bold cyan]PyPSA Explorer[/bold cyan] [green]v{__version__}[/green]
 
 🌐 Server: [yellow]{host}:{port}[/yellow]
 🐛 Debug Mode: [yellow]{"enabled" if debug else "disabled"}[/yellow]
-📁 Networks: [yellow]{len(networks_input) if networks_input else "demo"}[/yellow]
+📁 Networks: [yellow]{network_summary}[/yellow]
 
 [dim]Press Ctrl+C to stop the server[/dim]""",
         title="🔌 Starting Dashboard",
@@ -138,6 +143,7 @@ def main(
             debug=debug,
             host=host,
             port=port,
+            load_default_on_start=networks_input is not None,
         )
     except KeyboardInterrupt:
         console.print("\n[yellow]⏹  Shutting down PyPSA Explorer...[/yellow]")

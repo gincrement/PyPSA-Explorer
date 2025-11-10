@@ -70,7 +70,7 @@ def register_data_explorer_callbacks(app: dash.Dash, networks: dict[str, pypsa.N
         storage_units_clicks: int,
         stores_clicks: int,
         close_clicks: int,  # noqa: ARG001
-        network_label: str,
+        network_label: str | None,
         is_open: bool,  # noqa: ARG001
     ) -> tuple[bool, str, list[dict], list[dict], list[dict], str | None, str]:
         """Toggle modal and load component data when KPI card is clicked."""
@@ -106,6 +106,9 @@ def register_data_explorer_callbacks(app: dash.Dash, networks: dict[str, pypsa.N
         # Get the component name from the triggered card
         component_name = KPI_COMPONENT_MAP[triggered_id]
         component_label = COMPONENT_LABELS[component_name]
+
+        if not network_label or network_label not in networks:
+            return no_update, no_update, no_update, no_update, no_update, no_update, no_update  # type: ignore[return-value]
 
         try:
             # Get the active network
@@ -176,10 +179,13 @@ def register_data_explorer_callbacks(app: dash.Dash, networks: dict[str, pypsa.N
     def update_timeseries_data(
         selected_attribute: str | None,
         component_name: str | None,
-        network_label: str,
+        network_label: str | None,
     ) -> tuple[list[dict], list[dict]]:
         """Update time-series data table when attribute is selected."""
         if not selected_attribute or not component_name:
+            return [], []
+
+        if not network_label or network_label not in networks:
             return [], []
 
         try:
