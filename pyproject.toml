@@ -61,10 +61,10 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/openenergytransition/pypsa-explorer"
+Homepage = "https://github.com/open-energy-transition/pypsa-explorer"
 Documentation = "https://pypsa-explorer.readthedocs.io"
-Repository = "https://github.com/openenergytransition/pypsa-explorer"
-"Bug Tracker" = "https://github.com/openenergytransition/pypsa-explorer/issues"
+Repository = "https://github.com/open-energy-transition/pypsa-explorer"
+"Bug Tracker" = "https://github.com/open-energy-transition/pypsa-explorer/issues"
 
 [project.scripts]
 pypsa-explorer = "pypsa_explorer.cli:cli"
