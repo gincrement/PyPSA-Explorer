@@ -15,6 +15,7 @@ from dash.exceptions import PreventUpdate
 
 from pypsa_explorer.layouts.components import create_header
 from pypsa_explorer.utils.helpers import get_bus_carrier_options, get_country_options, summarize_network
+from pypsa_explorer.utils.network_loader import ensure_carriers_defined
 
 
 def register_network_callbacks(app, networks: dict[str, pypsa.Network], *, default_network_path: str) -> None:
@@ -130,6 +131,7 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network], *, defau
 
                 try:
                     network = pypsa.Network(stored_path)
+                    ensure_carriers_defined(network)
                 except Exception as exc:  # noqa: BLE001
                     stored_path.unlink(missing_ok=True)
                     feedback_messages.append(
@@ -176,6 +178,7 @@ def register_network_callbacks(app, networks: dict[str, pypsa.Network], *, defau
 
             try:
                 network = pypsa.Network(demo_path)
+                ensure_carriers_defined(network)
                 base_label = _sanitize_label(demo_path.stem or "Example")
                 label = _unique_label(base_label or "Example", order)
                 networks[label] = network
