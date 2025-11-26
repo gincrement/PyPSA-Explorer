@@ -1,8 +1,13 @@
 """Network loading utilities for PyPSA Explorer."""
 
+import logging
 import os
 
+import matplotlib.pyplot as plt
+import pandas as pd
 import pypsa
+
+logger = logging.getLogger(__name__)
 
 
 def load_networks(
@@ -39,14 +44,18 @@ def load_networks(
     if network_input is None:
         # Load default network
         if os.path.exists(default_network_path):
-            networks = {"Network": pypsa.Network(default_network_path)}
+            n = pypsa.Network(default_network_path)
+            ensure_carriers_defined(n)
+            networks = {"Network": n}
         else:
             raise FileNotFoundError(f"Default network file not found: {default_network_path}")
 
     elif isinstance(network_input, str):
         # Single network path provided
         if os.path.exists(network_input):
-            networks = {"Network": pypsa.Network(network_input)}
+            n = pypsa.Network(network_input)
+            ensure_carriers_defined(n)
+            networks = {"Network": n}
         else:
             raise FileNotFoundError(f"Network file not found: {network_input}")
 
@@ -55,10 +64,13 @@ def load_networks(
         for label, net_or_path in network_input.items():
             if isinstance(net_or_path, str):
                 if os.path.exists(net_or_path):
-                    networks[label] = pypsa.Network(net_or_path)
+                    n = pypsa.Network(net_or_path)
+                    ensure_carriers_defined(n)
+                    networks[label] = n
                 else:
                     print(f"Warning: Network file not found: {net_or_path}")
             elif isinstance(net_or_path, pypsa.Network):
+                ensure_carriers_defined(net_or_path)
                 networks[label] = net_or_path
             else:
                 print(f"Warning: Invalid type for network {label}. Skipping.")
@@ -100,3 +112,99 @@ def parse_cli_network_args(args: list[str]) -> dict[str, str]:
         network_paths[label] = path
 
     return network_paths
+
+
+def get_unique_carriers(n: pypsa.Network) -> set[str]:
+    """
+    Collect all unique carrier values from all network components.
+
+    Parameters
+    ----------
+    n : pypsa.Network
+        The PyPSA network object
+
+    Returns
+    -------
+    set[str]
+        Set of all unique carrier names found in the network
+    """
+    carriers: set[str] = set()
+
+    for c in n.c.values():
+        if c.static.empty or "carrier" not in c.static.columns:
+            continue
+        comp_carriers = c.static["carrier"].dropna()
+        comp_carriers = comp_carriers[comp_carriers != ""]
+        carriers.update(comp_carriers.unique())
+
+    return carriers
+
+
+def generate_colors(n_colors: int, palette: str = "tab10") -> list[str]:
+    """
+    Generate a list of hex colors from a matplotlib colormap.
+
+    Parameters
+    ----------
+    n_colors : int
+        Number of colors to generate
+    palette : str, default "tab10"
+        Matplotlib colormap name
+
+    Returns
+    -------
+    list[str]
+        List of hex color strings
+    """
+    cmap = plt.colormaps.get_cmap(palette)
+    colors = []
+    for i in range(n_colors):
+        rgba = cmap(i % cmap.N)
+        r, g, b = int(rgba[0] * 255), int(rgba[1] * 255), int(rgba[2] * 255)
+        hex_color = f"#{r:02x}{g:02x}{b:02x}"
+        colors.append(hex_color)
+    return colors
+
+
+def ensure_carriers_defined(n: pypsa.Network, palette: str = "tab10") -> None:
+    """
+    Ensure all carriers used in the network are defined in n.carriers with colors.
+
+    This function:
+    1. Collects all carriers used across network components
+    2. Adds any missing carriers to n.carriers
+    3. Assigns colors to carriers that don't have one
+
+    Parameters
+    ----------
+    n : pypsa.Network
+        The PyPSA network object to process
+    palette : str, default "tab10"
+        Matplotlib color palette for assigning colors to carriers
+    """
+    used_carriers = get_unique_carriers(n)
+    existing_carriers = set(n.carriers.index)
+    missing_carriers = sorted(used_carriers - existing_carriers)
+
+    if missing_carriers:
+        logger.info("Adding %d missing carriers: %s", len(missing_carriers), missing_carriers)
+        for carrier in missing_carriers:
+            n.carriers.loc[carrier] = pd.Series(dtype=object)
+
+    # Assign colors to carriers without a valid color
+    carriers_needing_color = []
+    for carrier in n.carriers.index:
+        color = n.carriers.at[carrier, "color"]
+        if pd.isna(color) or color == "":
+            carriers_needing_color.append(carrier)
+
+    if carriers_needing_color:
+        carriers_needing_color = sorted(carriers_needing_color)
+        colors = generate_colors(len(carriers_needing_color), palette)
+        for carrier, color in zip(carriers_needing_color, colors, strict=False):
+            n.carriers.at[carrier, "color"] = color
+        logger.info(
+            "Assigned colors to %d carriers using '%s' palette.",
+            len(carriers_needing_color),
+            palette,
+        )
