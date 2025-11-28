@@ -90,7 +90,7 @@
 <p>Main application module for PyPSA Explorer dashboard.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pypsa_explorer.app.create_app">
-<span class="sig-prename descclassname"><span class="pre">pypsa_explorer.app.</span></span><span class="sig-name descname"><span class="pre">create_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networks_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PyPSA</span> <span class="pre">Explorer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypsa_explorer/app.html#create_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypsa_explorer.app.create_app" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pypsa_explorer.app.</span></span><span class="sig-name descname"><span class="pre">create_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networks_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PyPSA</span> <span class="pre">Explorer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_default_on_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_network_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'demo-network.nc'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypsa_explorer/app.html#create_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypsa_explorer.app.create_app" title="Link to this definition"></a></dt>
 <dd><p>Create and configure the Dash application.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -98,9 +98,12 @@
 <li><p><strong>networks_input</strong> (<em>dict</em><em>, </em><em>str</em><em>, or </em><em>None</em>) – Networks to load. Can be:
 - dict: {label: network_object_or_path}
 - str: Path to a single network file
-- None: Load default demo network</p></li>
+- None: Behaviour depends on <code class="docutils literal notranslate"><span class="pre">load_default_on_start</span></code></p></li>
 <li><p><strong>title</strong> (<em>str</em>) – Dashboard title</p></li>
 <li><p><strong>debug</strong> (<em>bool</em>) – Whether to run in debug mode</p></li>
+<li><p><strong>load_default_on_start</strong> (<em>bool</em>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) load the bundled demo network if <code class="docutils literal notranslate"><span class="pre">networks_input</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+When <code class="docutils literal notranslate"><span class="pre">False</span></code> start without networks and rely on runtime uploads or sample loading.</p></li>
+<li><p><strong>default_network_path</strong> (<em>str</em>) – Filesystem path to the bundled demo network used when loading the example network.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -114,7 +117,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pypsa_explorer.app.run_dashboard">
-<span class="sig-prename descclassname"><span class="pre">pypsa_explorer.app.</span></span><span class="sig-name descname"><span class="pre">run_dashboard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networks_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8050</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypsa_explorer/app.html#run_dashboard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypsa_explorer.app.run_dashboard" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pypsa_explorer.app.</span></span><span class="sig-name descname"><span class="pre">run_dashboard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networks_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8050</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_default_on_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_network_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'demo-network.nc'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypsa_explorer/app.html#run_dashboard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypsa_explorer.app.run_dashboard" title="Link to this definition"></a></dt>
 <dd><p>Run the PyPSA Explorer dashboard.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -122,10 +125,12 @@
 <li><p><strong>networks_input</strong> (<em>dict</em><em>, </em><em>str</em><em>, or </em><em>None</em>) – Networks to load. Can be:
 - dict: {label: network_object_or_path} mapping labels to Network objects or file paths
 - str: Single path to a network file
-- None: Load default demo network</p></li>
+- None: Behaviour depends on <code class="docutils literal notranslate"><span class="pre">load_default_on_start</span></code></p></li>
 <li><p><strong>debug</strong> (<em>bool</em>) – Whether to run in debug mode</p></li>
 <li><p><strong>host</strong> (<em>str</em>) – Host to run the server on</p></li>
 <li><p><strong>port</strong> (<em>int</em>) – Port to run the server on</p></li>
+<li><p><strong>load_default_on_start</strong> (<em>bool</em>) – Controls whether the bundled demo network loads automatically when <code class="docutils literal notranslate"><span class="pre">networks_input</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>default_network_path</strong> (<em>str</em>) – Filesystem path to the bundled demo network used for the sample loader.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -154,7 +159,7 @@
 <span class="sig-prename descclassname"><span class="pre">pypsa_explorer.cli.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8050</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypsa_explorer/cli.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypsa_explorer.cli.main" title="Link to this definition"></a></dt>
 <dd><p>Launch the PyPSA Explorer dashboard.</p>
 <p>[dim]Examples:[/dim]</p>
-<p>[cyan]# Run with default demo network[/cyan]
+<p>[cyan]# Launch interactive landing page (drag-and-drop networks)[/cyan]
 $ pypsa-explorer</p>
 <p>[cyan]# Run with a single network[/cyan]
 $ pypsa-explorer /path/to/network.nc</p>
